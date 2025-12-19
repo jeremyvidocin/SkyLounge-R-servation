@@ -1,0 +1,23 @@
+# Fichiers sensibles
+*.log
+*.env
+.env.local
+
+# Fichiers temporaires
+*.tmp
+*.bak
+~$*
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Contrats générés (exemples de test)
+# Contrat*.pdf
+
+# Exports temporaires
+# *.csv
