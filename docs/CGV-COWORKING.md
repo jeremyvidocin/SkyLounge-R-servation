@@ -288,15 +288,17 @@ N° TVA Intracommunautaire : [NUMÉRO TVA]
 Voici le code HTML à copier dans une page WordPress :
 
 ```html
-<div class="cgv-container" style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6;">
+<link href="https://fonts.cdnfonts.com/css/gilroy-bold" rel="stylesheet">
 
-<h1 style="text-align: center; color: #1e73be; border-bottom: 3px solid #1e73be; padding-bottom: 15px;">CONDITIONS GÉNÉRALES DE VENTE</h1>
+<div class="cgv-container" style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: 'Gilroy', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6;">
+
+<h1 style="text-align: center; color: #1e73be; border-bottom: 3px solid #1e73be; padding-bottom: 15px; font-family: 'Gilroy', sans-serif; font-weight: 700;">CONDITIONS GÉNÉRALES DE VENTE</h1>
 
 <p style="text-align: center; color: #666; font-style: italic;">Dernière mise à jour : Décembre 2025</p>
 
-<nav style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 30px 0;">
-<h3 style="margin-top: 0;">Sommaire</h3>
-<ol style="columns: 2; -webkit-columns: 2; -moz-columns: 2;">
+<nav style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 30px 0; font-family: 'Gilroy', sans-serif;">
+<h3 style="margin-top: 0; font-family: 'Gilroy', sans-serif; font-weight: 700;">Sommaire</h3>
+<ol style="columns: 2; -webkit-columns: 2; -moz-columns: 2; font-family: 'Gilroy', sans-serif;">
 <li><a href="#article1">Objet et champ d'application</a></li>
 <li><a href="#article2">Services proposés</a></li>
 <li><a href="#article3">Processus de réservation</a></li>
@@ -314,28 +316,28 @@ Voici le code HTML à copier dans une page WordPress :
 
 <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 40px 0;">
 
-<h2 id="article1" style="color: #1e73be;">ARTICLE 1 – OBJET ET CHAMP D'APPLICATION</h2>
+<h2 id="article1" style="color: #1e73be; font-family: 'Gilroy', sans-serif; font-weight: 700;">ARTICLE 1 – OBJET ET CHAMP D'APPLICATION</h2>
 
-<h3>1.1 Objet</h3>
-<p>Les présentes Conditions Générales de Vente (ci-après "CGV") régissent les relations contractuelles entre <strong>SkyLounge</strong> (le "Prestataire") et toute personne effectuant une réservation d'espace de coworking (le "Client").</p>
+<h3 style="font-family: 'Gilroy', sans-serif; font-weight: 600;">1.1 Objet</h3>
+<p style="font-family: 'Gilroy', sans-serif;">Les présentes Conditions Générales de Vente (ci-après "CGV") régissent les relations contractuelles entre <strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">SkyLounge</strong> (le "Prestataire") et toute personne effectuant une réservation d'espace de coworking (le "Client").</p>
 
-<h3>1.2 Acceptation</h3>
-<p><strong>Toute réservation implique l'acceptation sans réserve des présentes CGV.</strong> Le Client reconnaît en avoir pris connaissance avant validation de sa commande.</p>
+<h3 style="font-family: 'Gilroy', sans-serif; font-weight: 600;">1.2 Acceptation</h3>
+<p style="font-family: 'Gilroy', sans-serif;"><strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">Toute réservation implique l'acceptation sans réserve des présentes CGV.</strong> Le Client reconnaît en avoir pris connaissance avant validation de sa commande.</p>
 
 <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 40px 0;">
 
-<h2 id="article2" style="color: #1e73be;">ARTICLE 2 – SERVICES PROPOSÉS</h2>
+<h2 id="article2" style="color: #1e73be; font-family: 'Gilroy', sans-serif; font-weight: 700;">ARTICLE 2 – SERVICES PROPOSÉS</h2>
 
-<h3>2.1 Description</h3>
-<p>SkyLounge propose la mise à disposition temporaire d'espaces de travail équipés :</p>
-<ul>
+<h3 style="font-family: 'Gilroy', sans-serif; font-weight: 600;">2.1 Description</h3>
+<p style="font-family: 'Gilroy', sans-serif;">SkyLounge propose la mise à disposition temporaire d'espaces de travail équipés :</p>
+<ul style="font-family: 'Gilroy', sans-serif;">
 <li>Bureaux privatifs</li>
 <li>Salles de réunion</li>
 <li>Accès WiFi haut débit</li>
 <li>Espaces communs (cuisine, sanitaires)</li>
 </ul>
 
-<h3>2.2 Formules</h3>
+<h3 style="font-family: 'Gilroy', sans-serif; font-weight: 600;">2.2 Formules</h3>
 <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
 <tr style="background: #1e73be; color: white;">
 <th style="padding: 12px; text-align: left;">Formule</th>
@@ -357,10 +359,10 @@ Voici le code HTML à copier dans une page WordPress :
 
 <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 40px 0;">
 
-<h2 id="article3" style="color: #1e73be;">ARTICLE 3 – PROCESSUS DE RÉSERVATION</h2>
+<h2 id="article3" style="color: #1e73be; font-family: 'Gilroy', sans-serif; font-weight: 700;">ARTICLE 3 – PROCESSUS DE RÉSERVATION</h2>
 
-<p>La réservation s'effectue en ligne :</p>
-<ol>
+<p style="font-family: 'Gilroy', sans-serif;">La réservation s'effectue en ligne :</p>
+<ol style="font-family: 'Gilroy', sans-serif;">
 <li>Sélection de l'espace et des dates</li>
 <li>Renseignement des informations personnelles</li>
 <li>Acceptation des CGV</li>
@@ -368,25 +370,25 @@ Voici le code HTML à copier dans une page WordPress :
 <li>Confirmation par email</li>
 </ol>
 
-<div style="background: #e8f4fd; border-left: 4px solid #1e73be; padding: 15px; margin: 20px 0;">
-<strong>Note :</strong> Aucune création de compte n'est requise. Toutes les informations sont envoyées par email.
+<div style="background: #e8f4fd; border-left: 4px solid #1e73be; padding: 15px; margin: 20px 0; font-family: 'Gilroy', sans-serif;">
+<strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">Note :</strong> Aucune création de compte n'est requise. Toutes les informations sont envoyées par email.
 </div>
 
 <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 40px 0;">
 
-<h2 id="article4" style="color: #1e73be;">ARTICLE 4 – TARIFS ET PAIEMENT</h2>
+<h2 id="article4" style="color: #1e73be; font-family: 'Gilroy', sans-serif; font-weight: 700;">ARTICLE 4 – TARIFS ET PAIEMENT</h2>
 
-<p>Les tarifs sont indiqués en euros TTC sur le site. Le paiement s'effectue par carte bancaire via une plateforme sécurisée. <strong>Aucune réservation ne sera confirmée sans paiement préalable.</strong></p>
+<p style="font-family: 'Gilroy', sans-serif;">Les tarifs sont indiqués en euros TTC sur le site. Le paiement s'effectue par carte bancaire via une plateforme sécurisée. <strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">Aucune réservation ne sera confirmée sans paiement préalable.</strong></p>
 
 <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 40px 0;">
 
-<h2 id="article5" style="color: #1e73be;">ARTICLE 5 – ANNULATION ET RÉTRACTATION</h2>
+<h2 id="article5" style="color: #1e73be; font-family: 'Gilroy', sans-serif; font-weight: 700;">ARTICLE 5 – ANNULATION ET RÉTRACTATION</h2>
 
-<div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0;">
-<strong>⚠️ Important :</strong> Conformément à l'article L221-28 du Code de la consommation, les réservations à dates déterminées <strong>ne bénéficient pas du droit de rétractation de 14 jours</strong>.
+<div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; font-family: 'Gilroy', sans-serif;">
+<strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">⚠️ Important :</strong> Conformément à l'article L221-28 du Code de la consommation, les réservations à dates déterminées <strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">ne bénéficient pas du droit de rétractation de 14 jours</strong>.
 </div>
 
-<h3>Conditions d'annulation</h3>
+<h3 style="font-family: 'Gilroy', sans-serif; font-weight: 600;">Conditions d'annulation</h3>
 <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
 <tr style="background: #1e73be; color: white;">
 <th style="padding: 12px; text-align: left;">Délai</th>
@@ -408,10 +410,10 @@ Voici le code HTML à copier dans une page WordPress :
 
 <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 40px 0;">
 
-<h2 id="article6" style="color: #1e73be;">ARTICLE 6 – ACCÈS ET RÈGLEMENT INTÉRIEUR</h2>
+<h2 id="article6" style="color: #1e73be; font-family: 'Gilroy', sans-serif; font-weight: 700;">ARTICLE 6 – ACCÈS ET RÈGLEMENT INTÉRIEUR</h2>
 
-<p>Le Client s'engage à :</p>
-<ul>
+<p style="font-family: 'Gilroy', sans-serif;">Le Client s'engage à :</p>
+<ul style="font-family: 'Gilroy', sans-serif;">
 <li>Respecter le calme et la tranquillité des autres occupants</li>
 <li>Maintenir les espaces propres</li>
 <li>Ne pas fumer dans les locaux</li>
@@ -420,58 +422,58 @@ Voici le code HTML à copier dans une page WordPress :
 
 <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 40px 0;">
 
-<h2 id="article7" style="color: #1e73be;">ARTICLE 7 – RESPONSABILITÉS</h2>
+<h2 id="article7" style="color: #1e73be; font-family: 'Gilroy', sans-serif; font-weight: 700;">ARTICLE 7 – RESPONSABILITÉS</h2>
 
-<p>SkyLounge met à disposition des espaces conformes à leur description. La responsabilité de SkyLounge ne peut être engagée pour les dommages indirects ou en cas de force majeure.</p>
+<p style="font-family: 'Gilroy', sans-serif;">SkyLounge met à disposition des espaces conformes à leur description. La responsabilité de SkyLounge ne peut être engagée pour les dommages indirects ou en cas de force majeure.</p>
 
-<p>Le Client est responsable de tout dommage causé aux locaux de son fait.</p>
-
-<hr style="border: none; border-top: 1px solid #e0e0e0; margin: 40px 0;">
-
-<h2 id="article8" style="color: #1e73be;">ARTICLE 8 – PROPRIÉTÉ INTELLECTUELLE</h2>
-
-<p>Tous les éléments du site sont la propriété exclusive de SkyLounge. Toute reproduction est interdite sans autorisation.</p>
+<p style="font-family: 'Gilroy', sans-serif;">Le Client est responsable de tout dommage causé aux locaux de son fait.</p>
 
 <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 40px 0;">
 
-<h2 id="article9" style="color: #1e73be;">ARTICLE 9 – DONNÉES PERSONNELLES</h2>
+<h2 id="article8" style="color: #1e73be; font-family: 'Gilroy', sans-serif; font-weight: 700;">ARTICLE 8 – PROPRIÉTÉ INTELLECTUELLE</h2>
 
-<p>Conformément au RGPD, les données personnelles sont :</p>
-<ul>
+<p style="font-family: 'Gilroy', sans-serif;">Tous les éléments du site sont la propriété exclusive de SkyLounge. Toute reproduction est interdite sans autorisation.</p>
+
+<hr style="border: none; border-top: 1px solid #e0e0e0; margin: 40px 0;">
+
+<h2 id="article9" style="color: #1e73be; font-family: 'Gilroy', sans-serif; font-weight: 700;">ARTICLE 9 – DONNÉES PERSONNELLES</h2>
+
+<p style="font-family: 'Gilroy', sans-serif;">Conformément au RGPD, les données personnelles sont :</p>
+<ul style="font-family: 'Gilroy', sans-serif;">
 <li>Collectées uniquement pour le traitement de la réservation</li>
 <li>Conservées 3 ans maximum</li>
 <li>Sécurisées (IP anonymisée)</li>
 </ul>
 
-<p>Vous disposez des droits d'accès, rectification et suppression. Contact : <a href="mailto:[EMAIL]">[EMAIL]</a></p>
+<p style="font-family: 'Gilroy', sans-serif;">Vous disposez des droits d'accès, rectification et suppression. Contact : <a href="mailto:[EMAIL]">[EMAIL]</a></p>
 
-<p>➡️ <a href="/politique-confidentialite">Consulter notre Politique de Confidentialité</a></p>
-
-<hr style="border: none; border-top: 1px solid #e0e0e0; margin: 40px 0;">
-
-<h2 id="article10" style="color: #1e73be;">ARTICLE 10 – RÉCLAMATIONS</h2>
-
-<p>Contact : <a href="mailto:[EMAIL]">[EMAIL]</a></p>
-<p>Plateforme européenne de médiation : <a href="https://ec.europa.eu/consumers/odr" target="_blank">https://ec.europa.eu/consumers/odr</a></p>
+<p style="font-family: 'Gilroy', sans-serif;">➡️ <a href="/politique-confidentialite">Consulter notre Politique de Confidentialité</a></p>
 
 <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 40px 0;">
 
-<h2 id="article11" style="color: #1e73be;">ARTICLE 11 – DISPOSITIONS GÉNÉRALES</h2>
+<h2 id="article10" style="color: #1e73be; font-family: 'Gilroy', sans-serif; font-weight: 700;">ARTICLE 10 – RÉCLAMATIONS</h2>
 
-<p>Les présentes CGV sont soumises au droit français. En cas de litige, les tribunaux de [VILLE] seront compétents.</p>
+<p style="font-family: 'Gilroy', sans-serif;">Contact : <a href="mailto:[EMAIL]">[EMAIL]</a></p>
+<p style="font-family: 'Gilroy', sans-serif;">Plateforme européenne de médiation : <a href="https://ec.europa.eu/consumers/odr" target="_blank">https://ec.europa.eu/consumers/odr</a></p>
 
 <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 40px 0;">
 
-<h2 id="article12" style="color: #1e73be;">ARTICLE 12 – INFORMATIONS LÉGALES</h2>
+<h2 id="article11" style="color: #1e73be; font-family: 'Gilroy', sans-serif; font-weight: 700;">ARTICLE 11 – DISPOSITIONS GÉNÉRALES</h2>
 
-<div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
-<p><strong>[RAISON SOCIALE]</strong><br>
+<p style="font-family: 'Gilroy', sans-serif;">Les présentes CGV sont soumises au droit français. En cas de litige, les tribunaux de [VILLE] seront compétents.</p>
+
+<hr style="border: none; border-top: 1px solid #e0e0e0; margin: 40px 0;">
+
+<h2 id="article12" style="color: #1e73be; font-family: 'Gilroy', sans-serif; font-weight: 700;">ARTICLE 12 – INFORMATIONS LÉGALES</h2>
+
+<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; font-family: 'Gilroy', sans-serif;">
+<p style="font-family: 'Gilroy', sans-serif;"><strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">[RAISON SOCIALE]</strong><br>
 [Forme juridique] au capital de [MONTANT] €<br>
 Siège social : [ADRESSE]<br>
 SIRET : [NUMÉRO]<br>
 N° TVA : [NUMÉRO]</p>
 
-<p><strong>Contact :</strong><br>
+<p style="font-family: 'Gilroy', sans-serif;"><strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">Contact :</strong><br>
 Email : <a href="mailto:[EMAIL]">[EMAIL]</a><br>
 Téléphone : [TÉLÉPHONE]</p>
 </div>

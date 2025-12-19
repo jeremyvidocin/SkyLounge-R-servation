@@ -243,37 +243,39 @@ Adresse : [ADRESSE]
 # VERSION HTML POUR WORDPRESS
 
 ```html
-<div class="privacy-policy" style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6;">
+<link href="https://fonts.cdnfonts.com/css/gilroy-bold" rel="stylesheet">
 
-<h1 style="text-align: center; color: #1e73be; border-bottom: 3px solid #1e73be; padding-bottom: 15px;">POLITIQUE DE CONFIDENTIALITÉ</h1>
+<div class="privacy-policy" style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: 'Gilroy', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6;">
+
+<h1 style="text-align: center; color: #1e73be; border-bottom: 3px solid #1e73be; padding-bottom: 15px; font-family: 'Gilroy', sans-serif; font-weight: 700;">POLITIQUE DE CONFIDENTIALITÉ</h1>
 
 <p style="text-align: center; color: #666; font-style: italic;">Dernière mise à jour : Décembre 2025</p>
 
-<div style="background: #e8f4fd; border-left: 4px solid #1e73be; padding: 15px; margin: 30px 0;">
-<strong>En résumé :</strong> Nous collectons uniquement les données nécessaires à votre réservation. Vos données sont sécurisées, jamais vendues, et conservées 3 ans maximum avant anonymisation automatique.
+<div style="background: #e8f4fd; border-left: 4px solid #1e73be; padding: 15px; margin: 30px 0; font-family: 'Gilroy', sans-serif;">
+<strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">En résumé :</strong> Nous collectons uniquement les données nécessaires à votre réservation. Vos données sont sécurisées, jamais vendues, et conservées 3 ans maximum avant anonymisation automatique.
 </div>
 
-<h2 style="color: #1e73be;">1. Qui sommes-nous ?</h2>
-<p><strong>[RAISON SOCIALE]</strong><br>
+<h2 style="color: #1e73be; font-family: 'Gilroy', sans-serif; font-weight: 700;">1. Qui sommes-nous ?</h2>
+<p style="font-family: 'Gilroy', sans-serif;"><strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">SkyLounge Coworking</strong><br>
 [Adresse]<br>
 Email : <a href="mailto:[EMAIL]">[EMAIL]</a></p>
 
-<h2 style="color: #1e73be;">2. Quelles données collectons-nous ?</h2>
+<h2 style="color: #1e73be; font-family: 'Gilroy', sans-serif; font-weight: 700;">2. Quelles données collectons-nous ?</h2>
 
-<h3>Lors d'une réservation</h3>
-<ul>
-<li><strong>Nom et prénom</strong> – Pour vous identifier</li>
-<li><strong>Email</strong> – Pour vous envoyer la confirmation et le contrat</li>
-<li><strong>Téléphone</strong> – Pour vous contacter si nécessaire</li>
-<li><strong>Adresse IP</strong> – Anonymisée (ex: 192.168.1.0) pour la sécurité</li>
+<h3 style="font-family: 'Gilroy', sans-serif; font-weight: 600;">Lors d'une réservation</h3>
+<ul style="font-family: 'Gilroy', sans-serif;">
+<li><strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">Nom et prénom</strong> – Pour vous identifier</li>
+<li><strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">Email</strong> – Pour vous envoyer la confirmation et le contrat</li>
+<li><strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">Téléphone</strong> – Pour vous contacter si nécessaire</li>
+<li><strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">Adresse IP</strong> – Anonymisée (ex: 192.168.1.0) pour la sécurité</li>
 </ul>
 
-<div style="background: #d4edda; border-left: 4px solid #28a745; padding: 15px; margin: 20px 0;">
-<strong>✓ Ce que nous ne stockons PAS :</strong> Numéro de carte bancaire (traité uniquement par notre prestataire de paiement sécurisé)
+<div style="background: #d4edda; border-left: 4px solid #28a745; padding: 15px; margin: 20px 0; font-family: 'Gilroy', sans-serif;">
+<strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">✓ Ce que nous ne stockons PAS :</strong> Numéro de carte bancaire (traité uniquement par notre prestataire de paiement sécurisé)
 </div>
 
-<h2 style="color: #1e73be;">3. Pourquoi collectons-nous ces données ?</h2>
-<ul>
+<h2 style="color: #1e73be; font-family: 'Gilroy', sans-serif; font-weight: 700;">3. Pourquoi collectons-nous ces données ?</h2>
+<ul style="font-family: 'Gilroy', sans-serif;">
 <li>Traiter votre réservation</li>
 <li>Vous envoyer la confirmation et le contrat</li>
 <li>Vous contacter en cas de problème</li>
@@ -281,7 +283,7 @@ Email : <a href="mailto:[EMAIL]">[EMAIL]</a></p>
 <li>Respecter nos obligations légales</li>
 </ul>
 
-<h2 style="color: #1e73be;">4. Combien de temps conservons-nous vos données ?</h2>
+<h2 style="color: #1e73be; font-family: 'Gilroy', sans-serif; font-weight: 700;">4. Combien de temps conservons-nous vos données ?</h2>
 
 <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
 <tr style="background: #1e73be; color: white;">
@@ -290,21 +292,23 @@ Email : <a href="mailto:[EMAIL]">[EMAIL]</a></p>
 </tr>
 <tr>
 <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">Données de réservation</td>
-<td style="padding: 12px; border-bottom: 1px solid #e0e0e0;"><strong>3 ans</strong> puis anonymisation automatique</td>
+<td style="padding: 12px; border-bottom: 1px solid #e0e0e0;"><strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">3 ans</strong> puis anonymisation automatique</td>
 </tr>
 <tr style="background: #f8f9fa;">
 <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">Factures</td>
-<td style="padding: 12px; border-bottom: 1px solid #e0e0e0;"><strong>10 ans</strong> (obligation légale)</td>
+<td style="padding: 12px; border-bottom: 1px solid #e0e0e0;"><strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">10 ans</strong> (obligation légale)</td>
 </tr>
 </table>
 
-**Pour exercer vos droits, contactez-nous :**
-- Email : **rgpd@skyloungefwi.fr**
-- Courrier : SkyLounge Coworking, [Votre adresse]
+<p style="font-family: 'Gilroy', sans-serif;"><strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">Pour exercer vos droits, contactez-nous :</strong></p>
+<ul style="font-family: 'Gilroy', sans-serif;">
+<li>Email : <strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">rgpd@skyloungefwi.fr</strong></li>
+<li>Courrier : SkyLounge Coworking, [Votre adresse]</li>
+</ul>
 
-**Délai de réponse :** 30 jours maximum
+<p style="font-family: 'Gilroy', sans-serif;"><strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">Délai de réponse :</strong> 30 jours maximum</p>
 
-**Pièces à fournir :** Copie d'une pièce d'identité pour vérifier votre identité.
+<p style="font-family: 'Gilroy', sans-serif;"><strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">Pièces à fournir :</strong> Copie d'une pièce d'identité pour vérifier votre identité.</p>
 
 ---
 
@@ -313,19 +317,19 @@ Email : <a href="mailto:[EMAIL]">[EMAIL]</a></p>
 Nous mettons en œuvre des mesures techniques et organisationnelles pour protéger vos données :
 
 ### Mesures techniques
-- 🔒 **Connexion HTTPS** sécurisée (certificat SSL)
-- 🔒 **Chiffrement** des données sensibles en base
-- 🔒 **Sauvegarde quotidienne** automatique
-- 🔒 **Pare-feu** et protection anti-intrusion
-- 🔒 **Mises à jour** de sécurité régulières
+- 🔒 <strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">Connexion HTTPS</strong> sécurisée (certificat SSL)
+- 🔒 <strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">Chiffrement</strong> des données sensibles en base
+- 🔒 <strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">Sauvegarde quotidienne</strong> automatique
+- 🔒 <strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">Pare-feu</strong> et protection anti-intrusion
+- 🔒 <strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">Mises à jour</strong> de sécurité régulières
 
 ### Mesures organisationnelles
-- 👥 **Accès restreint** au personnel autorisé uniquement
-- 📝 **Registre des traitements** conforme RGPD
-- 🔐 **Mots de passe** complexes et renouvelés
-- 📊 **Audits** de sécurité réguliers
+- 👥 <strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">Accès restreint</strong> au personnel autorisé uniquement
+- 📝 <strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">Registre des traitements</strong> conforme RGPD
+- 🔐 <strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">Mots de passe</strong> complexes et renouvelés
+- 📊 <strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">Audits</strong> de sécurité réguliers
 
-**Hébergement :** Nos données sont hébergées sur des serveurs sécurisés situés dans l'Union Européenne.
+<strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">Hébergement :</strong> Nos données sont hébergées sur des serveurs sécurisés situés dans l'Union Européenne.
 
 ---
 
@@ -347,13 +351,13 @@ Un cookie est un petit fichier texte déposé sur votre navigateur lors de votre
 ### 8.3 Gestion des cookies
 
 Vous pouvez gérer vos préférences cookies :
-- Via le **bandeau cookies** affiché lors de votre première visite
-- En modifiant les **paramètres de votre navigateur**
+- Via le <strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">bandeau cookies</strong> affiché lors de votre première visite
+- En modifiant les <strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">paramètres de votre navigateur</strong>
   - Chrome : Paramètres > Confidentialité > Cookies
   - Firefox : Options > Vie privée > Cookies
   - Safari : Préférences > Confidentialité > Cookies
 
-⚠️ **Attention :** Le refus des cookies essentiels peut empêcher le bon fonctionnement de la réservation en ligne.
+⚠️ <strong style="font-family: 'Gilroy', sans-serif; font-weight: 700;">Attention :</strong> Le refus des cookies essentiels peut empêcher le bon fonctionnement de la réservation en ligne.
 
 ---
 
