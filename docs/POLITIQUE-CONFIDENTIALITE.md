@@ -1,3 +1,23 @@
+<style>
+@import url('https://fonts.cdnfonts.com/css/gilroy-bold');
+
+body {
+    font-family: 'Gilroy', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.6;
+    color: #2c3e50;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Gilroy', sans-serif;
+    font-weight: 700;
+}
+
+strong {
+    font-family: 'Gilroy', sans-serif;
+    font-weight: 600;
+}
+</style>
+
 # POLITIQUE DE CONFIDENTIALITÉ
 ## SkyLounge Coworking
 
