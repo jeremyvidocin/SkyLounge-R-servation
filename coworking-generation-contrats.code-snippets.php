@@ -1,31 +1,55 @@
 <?php
-
-/**
- * Coworking Génération Contrats
- */
 /**
  * =============================================================================
- * COWORKING CONTRACT SYSTEM - VERSION 2.0 PREMIUM
+ * COWORKING CONTRACT SYSTEM - VERSION 2.1 PREMIUM
  * =============================================================================
  *
  * Système complet de génération automatique de contrats PDF pour les
- * réservations d'espaces de coworking.
+ * réservations d'espaces de coworking SkyLounge.
  *
- * FONCTIONNALITÉS:
- * - Génération automatique de contrats PDF professionnels
+ * Ce module gère l'ensemble du cycle de vie des contrats :
+ * - Génération automatique après paiement (si seuils atteints)
+ * - Template HTML premium avec design professionnel
+ * - Conversion en PDF via DOMPDF (plugin WPO WCPDF)
  * - Envoi par email avec pièce jointe
- * - Accès client via "Mon compte" WooCommerce
- * - Interface admin complète avec metabox
+ * - Accès client sécurisé via "Mon compte" WooCommerce
+ * - Interface admin avec métabox dédiée
  * - Page de configuration des informations entreprise
- * - Numérotation séquentielle des contrats
+ * - Numérotation séquentielle annuelle (CW-YYYY-NNNNN)
+ * - Système de vérification publique avec QR Code
  *
- * PRÉREQUIS:
- * - Plugin "PDF Invoices & Packing Slips for WooCommerce" (WPO WCPDF)
- * - WooCommerce actif
- * - ACF Pro pour les champs personnalisés
+ * CONDITIONS DE GÉNÉRATION AUTOMATIQUE (AU MOINS UNE) :
+ * - Durée de réservation >= 7 jours
+ * - Montant total >= 200 EUR
+ * - Formule "semaine" ou "mois"
  *
- * @version 2.1
- * @author Coworking System
+ * SÉCURITÉ :
+ * - Protection contre la traversée de répertoire
+ * - Tokens d'accès sécurisés avec hash_equals()
+ * - Validation des nonces AJAX
+ * - Headers de sécurité (X-Content-Type-Options, X-Frame-Options)
+ *
+ * PRÉREQUIS :
+ * - WordPress 6.0+
+ * - WooCommerce 8.0+ (compatible HPOS)
+ * - ACF Pro 6.0+ pour les champs personnalisés
+ * - (Optionnel) Plugin "PDF Invoices & Packing Slips for WooCommerce"
+ *   pour la génération PDF native (sinon fallback HTML)
+ *
+ * @package     SkyLounge_Coworking
+ * @subpackage  Contracts
+ * @author      Jérémy VIDOCIN <contact@skylounge.fr>
+ * @copyright   2025 SkyLounge Coworking
+ * @license     Proprietary
+ * @version     2.1.0
+ * @since       1.0.0
+ *
+ * @see CW_CONTRACT_VERSION      Version actuelle du système
+ * @see CW_CONTRACT_DIR          Répertoire de stockage des contrats
+ * @see CW_CONTRACT_MIN_DAYS     Seuil de durée pour génération auto
+ * @see CW_CONTRACT_MIN_AMOUNT   Seuil de montant pour génération auto
+ *
+ * @link https://github.com/jeremyvidocin/SkyLounge-R-servation
  */
 
 // Sécurité: empêcher l'accès direct
@@ -55,8 +79,33 @@ define('CW_CONTRACT_FORMULAS', ['mois', 'semaine']); // OU si formule dans cette
 ============================================================================= */
 
 /**
- * Récupère les informations de l'entreprise pour le contrat
- * Ces valeurs sont configurables via WooCommerce > Contrats Coworking
+ * Récupère les informations légales de l'entreprise pour le contrat.
+ *
+ * Les valeurs sont stockées en options WordPress et configurables
+ * via le menu WooCommerce > Contrats Coworking.
+ *
+ * @since 1.0.0
+ * @since 2.1.0 Ajout du champ RCS
+ *
+ * @return array {
+ *     Tableau associatif des informations entreprise.
+ *
+ *     @type string $name     Raison sociale de l'entreprise.
+ *     @type string $legal    Forme juridique et capital.
+ *     @type string $address  Adresse complète du siège social.
+ *     @type string $siret    Numéro SIRET (14 chiffres).
+ *     @type string $tva      Numéro de TVA intracommunautaire.
+ *     @type string $email    Email de contact principal.
+ *     @type string $phone    Téléphone de contact.
+ *     @type string $website  URL du site web.
+ *     @type string $logo_url URL du logo entreprise.
+ *     @type string $rcs      Numéro RCS et ville d'immatriculation.
+ * }
+ *
+ * @example
+ * $company = cw_get_company_info();
+ * echo $company['name']; // "SkyLounge Coworking"
+ * echo $company['siret']; // "12345678901234"
  */
 function cw_get_company_info() {
     return [
@@ -116,8 +165,23 @@ add_action('admin_notices', function() {
 ============================================================================= */
 
 /**
- * Génère un numéro de contrat unique
- * Format: CW-YYYY-NNNNN (ex: CW-2025-00001)
+ * Génère un numéro de contrat unique avec numérotation séquentielle annuelle.
+ *
+ * Le compteur est réinitialisé chaque année (stocké en option WordPress).
+ * Format : CW-YYYY-NNNNN (ex: CW-2025-00001)
+ *
+ * @since 1.0.0
+ *
+ * @global wpdb $wpdb WordPress database abstraction object.
+ *
+ * @return string Numéro de contrat unique au format CW-YYYY-NNNNN.
+ *
+ * @example
+ * $number = cw_generate_contract_number();
+ * // Retourne : "CW-2025-00042" (42ème contrat de 2025)
+ *
+ * @see get_option()    Récupère le compteur actuel.
+ * @see update_option() Incrémente le compteur.
  */
 function cw_generate_contract_number() {
     $year = date('Y');
@@ -131,7 +195,28 @@ function cw_generate_contract_number() {
 }
 
 /**
- * Vérifie si un contrat doit être généré pour cette commande
+ * Vérifie si un contrat doit être généré pour une commande donnée.
+ *
+ * Un contrat est généré si AU MOINS UNE de ces conditions est remplie :
+ * - La formule est "semaine" ou "mois" (CW_CONTRACT_FORMULAS)
+ * - La durée totale >= 7 jours (CW_CONTRACT_MIN_DAYS)
+ * - Le montant total >= 200 EUR (CW_CONTRACT_MIN_AMOUNT)
+ *
+ * @since 1.0.0
+ * @since 2.0.0 Ajout de la vérification par formule.
+ *
+ * @param int $order_id ID de la commande WooCommerce.
+ *
+ * @return bool True si un contrat doit être généré, false sinon.
+ *
+ * @example
+ * if (cw_should_generate_contract($order_id)) {
+ *     cw_generate_contract_pdf($order_id);
+ * }
+ *
+ * @see CW_CONTRACT_MIN_DAYS    Seuil de durée minimum.
+ * @see CW_CONTRACT_MIN_AMOUNT  Seuil de montant minimum.
+ * @see CW_CONTRACT_FORMULAS    Formules qui génèrent toujours un contrat.
  */
 function cw_should_generate_contract($order_id) {
     $order = wc_get_order($order_id);
@@ -159,11 +244,41 @@ function cw_should_generate_contract($order_id) {
 }
 
 /* =============================================================================
-   TEMPLATE HTML DU CONTRAT - DESIGN PREMIUM CORRIGÉ
+   TEMPLATE HTML DU CONTRAT - DESIGN PREMIUM
 ============================================================================= */
 
 /**
- * Génère le HTML du contrat avec un design professionnel
+ * Génère le template HTML complet du contrat avec design professionnel.
+ *
+ * Le template inclut :
+ * - En-tête avec logo et informations entreprise
+ * - Identification des parties (prestataire / client)
+ * - Détails de la réservation (espace, dates, tarifs)
+ * - Articles juridiques (12 articles)
+ * - Zone de signatures avec QR Code de vérification
+ * - Conditions générales sur page 2
+ *
+ * Le HTML est optimisé pour la conversion PDF via DOMPDF :
+ * - Pagination correcte avec @page CSS
+ * - Évitement des coupures de texte (page-break-inside: avoid)
+ * - Polices compatibles (Segoe UI, DejaVu Sans)
+ *
+ * @since 1.0.0
+ * @since 2.1.0 Refonte complète du design, ajout QR Code, pagination DOMPDF.
+ *
+ * @param int    $order_id        ID de la commande WooCommerce.
+ * @param string $contract_number Numéro de contrat (ex: CW-2025-00042).
+ *
+ * @return string HTML complet du contrat, ou chaîne vide si données manquantes.
+ *
+ * @example
+ * $html = cw_generate_contract_html(123, 'CW-2025-00042');
+ * if (!empty($html)) {
+ *     // Convertir en PDF ou afficher
+ * }
+ *
+ * @see cw_get_company_info()      Récupère les infos entreprise.
+ * @see cw_get_included_services() Récupère les services de l'offre.
  */
 function cw_generate_contract_html($order_id, $contract_number) {
     $order = wc_get_order($order_id);
@@ -1147,7 +1262,22 @@ add_action('admin_init', function() {
 });
 
 /**
- * Récupère les services inclus pour une offre
+ * Récupère la liste des services inclus pour une offre de coworking.
+ *
+ * Tente de récupérer les services personnalisés depuis ACF (champ 'services_inclus').
+ * Si le champ n'existe pas ou est vide, retourne une liste de services par défaut.
+ *
+ * @since 1.0.0
+ *
+ * @param int $offre_id ID du post CPT "offre" de coworking.
+ *
+ * @return array Liste des services inclus (chaînes de caractères).
+ *
+ * @example
+ * $services = cw_get_included_services(42);
+ * // Retourne : ['WiFi haut débit', 'Café offert', ...]
+ *
+ * @see get_field() Fonction ACF pour récupérer les champs personnalisés.
  */
 function cw_get_included_services($offre_id) {
     // Services par défaut
@@ -1324,6 +1454,32 @@ function cw_generate_contract_pdf($order_id, $existing_number = null) {
 
 add_action('woocommerce_order_status_completed', 'cw_maybe_generate_contract_on_complete', 20);
 
+/**
+ * Génère automatiquement un contrat lorsqu'une commande passe en statut "Terminée".
+ *
+ * Cette fonction est hookée sur 'woocommerce_order_status_completed' avec une priorité
+ * de 20 pour s'exécuter après les actions WooCommerce standard.
+ *
+ * Workflow :
+ * 1. Vérifie si la commande nécessite un contrat (via cw_should_generate_contract())
+ * 2. Vérifie si un contrat n'existe pas déjà
+ * 3. Génère le PDF/HTML
+ * 4. Ajoute une note à la commande
+ * 5. Envoie l'email au client
+ *
+ * @since 1.0.0
+ * @since 2.0.0 Ajout de la notification admin si fallback HTML.
+ *
+ * @param int $order_id ID de la commande WooCommerce qui vient d'être complétée.
+ *
+ * @return void
+ *
+ * @see cw_should_generate_contract() Vérifie les seuils de génération.
+ * @see cw_generate_contract_pdf()    Génère le fichier PDF/HTML.
+ * @see cw_send_contract_email()      Envoie le contrat par email.
+ *
+ * @hook woocommerce_order_status_completed
+ */
 function cw_maybe_generate_contract_on_complete($order_id) {
     // Vérifier si c'est une commande coworking nécessitant un contrat
     if (!cw_should_generate_contract($order_id)) {
@@ -1370,6 +1526,35 @@ function cw_maybe_generate_contract_on_complete($order_id) {
    ENVOI EMAIL AVEC CONTRAT
 ============================================================================= */
 
+/**
+ * Envoie le contrat par email au client avec le fichier en pièce jointe.
+ *
+ * L'email contient :
+ * - Récapitulatif de la réservation (espace, dates, montant)
+ * - Lien sécurisé vers le contrat en ligne
+ * - Fichier PDF/HTML en pièce jointe
+ * - Informations de contact de l'entreprise
+ *
+ * Met à jour les métadonnées de la commande :
+ * - _cw_contract_sent : Date d'envoi
+ * - _cw_contract_email_status : 'sent' ou 'failed'
+ *
+ * @since 1.0.0
+ * @since 2.1.0 Ajout du lien sécurisé et amélioration du template email.
+ *
+ * @param int $order_id ID de la commande WooCommerce.
+ *
+ * @return bool True si l'email a été envoyé avec succès, false sinon.
+ *
+ * @example
+ * $result = cw_generate_contract_pdf($order_id);
+ * if ($result['success']) {
+ *     cw_send_contract_email($order_id);
+ * }
+ *
+ * @see wp_mail()                       Fonction WordPress d'envoi d'email.
+ * @see cw_generate_contract_secure_link() Génère le lien d'accès sécurisé.
+ */
 function cw_send_contract_email($order_id) {
     $order = wc_get_order($order_id);
     if (!$order) return false;
@@ -1472,6 +1657,31 @@ Des questions ? Répondez à cet email.
    ACCÈS SÉCURISÉ AU CONTRAT (LIEN PUBLIC)
 ============================================================================= */
 
+/**
+ * Génère un lien sécurisé pour accéder au contrat sans authentification.
+ *
+ * Le token est généré à partir de :
+ * - L'ID de la commande
+ * - La clé de commande WooCommerce (order_key)
+ * - Le sel WordPress (wp_salt)
+ *
+ * Ce lien peut être partagé avec le client par email ou SMS.
+ * Il reste valide indéfiniment tant que le token n'est pas régénéré.
+ *
+ * @since 1.0.0
+ * @since 2.1.0 Utilisation de wp_hash() pour une meilleure sécurité.
+ *
+ * @param int $order_id ID de la commande WooCommerce.
+ *
+ * @return string URL complète avec token d'accès, ou chaîne vide si erreur.
+ *
+ * @example
+ * $link = cw_generate_contract_secure_link(123);
+ * // Retourne : "https://skylounge.fr/?cw_contract=123&token=abc123..."
+ *
+ * @see wp_hash()        Génère un hash sécurisé.
+ * @see add_query_arg()  Construit l'URL avec paramètres.
+ */
 function cw_generate_contract_secure_link($order_id) {
     $order = wc_get_order($order_id);
     if (!$order) return '';
@@ -1487,6 +1697,25 @@ function cw_generate_contract_secure_link($order_id) {
 
 add_action('template_redirect', 'cw_handle_contract_download');
 
+/**
+ * Gère le téléchargement public d'un contrat via lien sécurisé.
+ *
+ * Vérifications de sécurité :
+ * - Validation du token avec hash_equals() (timing-safe)
+ * - Protection contre la traversée de répertoire (path traversal)
+ * - Logging des tentatives d'accès non autorisées
+ * - Headers de sécurité (X-Content-Type-Options, X-Frame-Options)
+ *
+ * @since 1.0.0
+ * @since 2.1.0 Renforcement sécurité (hash_equals, realpath check).
+ *
+ * @return void Termine l'exécution avec exit() après envoi du fichier.
+ *
+ * @hook template_redirect
+ *
+ * @see cw_generate_contract_secure_link() Génère le lien d'accès.
+ * @see cw_wrap_html_contract()            Wrapper pour affichage HTML.
+ */
 function cw_handle_contract_download() {
     if (!isset($_GET['cw_contract']) || !isset($_GET['token'])) {
         return;
@@ -1557,7 +1786,26 @@ function cw_handle_contract_download() {
 }
 
 /**
- * Wrap le contrat HTML dans une page élégante style PDF viewer
+ * Encapsule un contrat HTML dans une interface style visionneuse PDF.
+ *
+ * Crée une page web élégante avec :
+ * - Barre d'outils fixe (style Chrome PDF viewer)
+ * - Boutons d'impression et téléchargement
+ * - Rendu du contrat sur fond de page A4
+ * - Styles responsives pour mobile
+ * - Mode impression optimisé
+ *
+ * @since 2.0.0
+ * @since 2.1.0 Amélioration du design et ajout boutons interactifs.
+ *
+ * @param string $html_content    Contenu HTML brut du contrat.
+ * @param string $contract_number Numéro de contrat pour le titre.
+ *
+ * @return string HTML complet de la page avec wrapper.
+ *
+ * @example
+ * $wrapped = cw_wrap_html_contract($html, 'CW-2025-00042');
+ * echo $wrapped;
  */
 function cw_wrap_html_contract($html_content, $contract_number) {
     // Extraire le contenu du body
@@ -1725,6 +1973,21 @@ function cw_wrap_html_contract($html_content, $contract_number) {
 
 add_action('add_meta_boxes', 'cw_add_contract_metabox');
 
+/**
+ * Enregistre la metabox "Contrat Coworking" sur les pages de commande.
+ *
+ * Compatible avec HPOS (High-Performance Order Storage) de WooCommerce.
+ * Détecte automatiquement si HPOS est activé pour utiliser le bon screen ID.
+ *
+ * @since 1.0.0
+ * @since 2.0.0 Compatibilité HPOS ajoutée.
+ *
+ * @return void
+ *
+ * @hook add_meta_boxes
+ *
+ * @see cw_render_contract_metabox() Callback de rendu de la metabox.
+ */
 function cw_add_contract_metabox() {
     // Compatibilité HPOS
     $screen = class_exists('\Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController')
@@ -1742,6 +2005,29 @@ function cw_add_contract_metabox() {
     );
 }
 
+/**
+ * Affiche le contenu de la metabox "Contrat Coworking".
+ *
+ * Affiche selon le contexte :
+ * - Si contrat existant : numéro, format, dates, boutons d'actions
+ * - Si contrat requis : alerte + bouton de génération
+ * - Si contrat non requis : message informatif
+ *
+ * Actions disponibles :
+ * - Voir le contrat (nouvel onglet)
+ * - Télécharger
+ * - Renvoyer par email
+ * - Régénérer (avec même numéro)
+ *
+ * @since 1.0.0
+ * @since 2.1.0 Ajout du bouton "Régénérer".
+ *
+ * @param WP_Post|WC_Order $post_or_order Objet commande (HPOS) ou post (legacy).
+ *
+ * @return void
+ *
+ * @see cw_should_generate_contract() Vérifie si un contrat est requis.
+ */
 function cw_render_contract_metabox($post_or_order) {
     $order = ($post_or_order instanceof WC_Order) ? $post_or_order : wc_get_order($post_or_order->ID);
     if (!$order) return;
@@ -1836,6 +2122,26 @@ function cw_render_contract_metabox($post_or_order) {
 // Générer un contrat
 add_action('wp_ajax_cw_generate_contract', 'cw_ajax_generate_contract');
 
+/**
+ * Handler AJAX pour générer un nouveau contrat depuis l'admin.
+ *
+ * Sécurité :
+ * - Vérification du nonce WordPress
+ * - Vérification de la capacité 'manage_woocommerce'
+ * - Validation de l'ID de commande
+ *
+ * Après génération, redirige vers la page de commande avec un message
+ * de succès ou d'erreur via query string.
+ *
+ * @since 1.0.0
+ *
+ * @return void Redirige et termine l'exécution.
+ *
+ * @hook wp_ajax_cw_generate_contract
+ *
+ * @see cw_generate_contract_pdf() Génère le fichier PDF/HTML.
+ * @see cw_send_contract_email()   Envoie l'email au client.
+ */
 function cw_ajax_generate_contract() {
     // Vérification du nonce
     if (!check_ajax_referer('cw_generate_contract', '_wpnonce', false)) {
@@ -1873,6 +2179,19 @@ function cw_ajax_generate_contract() {
 // Voir un contrat
 add_action('wp_ajax_cw_view_contract', 'cw_ajax_view_contract');
 
+/**
+ * Handler AJAX pour afficher un contrat dans le navigateur (admin).
+ *
+ * Sert le fichier PDF inline ou affiche le HTML dans un wrapper élégant.
+ * Inclut des vérifications de sécurité contre la traversée de répertoire.
+ *
+ * @since 1.0.0
+ * @since 2.1.0 Ajout protection path traversal.
+ *
+ * @return void Termine avec exit() après envoi du fichier.
+ *
+ * @hook wp_ajax_cw_view_contract
+ */
 function cw_ajax_view_contract() {
     // Vérification du nonce
     if (!check_ajax_referer('cw_view_contract', '_wpnonce', false)) {
@@ -1934,6 +2253,22 @@ function cw_ajax_view_contract() {
 // Télécharger un contrat
 add_action('wp_ajax_cw_download_contract', 'cw_ajax_download_contract');
 
+/**
+ * Handler AJAX pour télécharger un contrat (admin).
+ *
+ * Force le téléchargement avec Content-Disposition: attachment.
+ * Génère un nom de fichier sécurisé (caractères alphanumériques uniquement).
+ *
+ * Headers de sécurité :
+ * - X-Content-Type-Options: nosniff
+ * - Cache-Control: private, no-cache
+ *
+ * @since 1.0.0
+ *
+ * @return void Termine avec exit() après envoi du fichier.
+ *
+ * @hook wp_ajax_cw_download_contract
+ */
 function cw_ajax_download_contract() {
     // Vérification du nonce
     if (!check_ajax_referer('cw_download_contract', '_wpnonce', false)) {
@@ -1991,6 +2326,20 @@ function cw_ajax_download_contract() {
 // Renvoyer un contrat
 add_action('wp_ajax_cw_resend_contract', 'cw_ajax_resend_contract');
 
+/**
+ * Handler AJAX pour renvoyer un contrat par email (admin).
+ *
+ * Réutilise le contrat existant sans le régénérer.
+ * Redirige vers la page de commande avec message de succès/erreur.
+ *
+ * @since 1.0.0
+ *
+ * @return void Redirige et termine l'exécution.
+ *
+ * @hook wp_ajax_cw_resend_contract
+ *
+ * @see cw_send_contract_email() Envoie l'email avec pièce jointe.
+ */
 function cw_ajax_resend_contract() {
     check_ajax_referer('cw_resend_contract');
 
@@ -2012,9 +2361,30 @@ function cw_ajax_resend_contract() {
     exit;
 }
 
-// Regénérer un contrat (supprimer l'ancien et en créer un nouveau)
+// Régénérer un contrat (supprimer l'ancien et en créer un nouveau)
 add_action('wp_ajax_cw_regenerate_contract', 'cw_ajax_regenerate_contract');
 
+/**
+ * Handler AJAX pour régénérer un contrat avec le même numéro (admin).
+ *
+ * Workflow :
+ * 1. Supprime l'ancien fichier physique
+ * 2. Efface les métadonnées (sauf numéro et token)
+ * 3. Génère un nouveau PDF/HTML avec le même numéro
+ * 4. Envoie automatiquement par email
+ * 5. Ajoute une note à la commande
+ *
+ * Utile pour corriger un contrat après modification des informations
+ * entreprise ou correction d'une erreur.
+ *
+ * @since 2.1.0
+ *
+ * @return void Redirige et termine l'exécution.
+ *
+ * @hook wp_ajax_cw_regenerate_contract
+ *
+ * @see cw_generate_contract_pdf() Génère le nouveau fichier.
+ */
 function cw_ajax_regenerate_contract() {
     check_ajax_referer('cw_regenerate_contract');
 
@@ -2075,7 +2445,21 @@ function cw_ajax_regenerate_contract() {
 }
 
 /**
- * Helper: Obtenir l'URL d'édition d'une commande (compatible HPOS)
+ * Obtient l'URL d'édition d'une commande WooCommerce.
+ *
+ * Compatible avec HPOS (High-Performance Order Storage).
+ * Détecte automatiquement si HPOS est activé pour générer la bonne URL.
+ *
+ * @since 2.0.0
+ *
+ * @param int $order_id ID de la commande WooCommerce.
+ *
+ * @return string URL d'édition de la commande dans l'admin.
+ *
+ * @example
+ * $url = cw_get_order_edit_url(123);
+ * // HPOS activé : "admin.php?page=wc-orders&action=edit&id=123"
+ * // Legacy : "post.php?post=123&action=edit"
  */
 function cw_get_order_edit_url($order_id) {
     if (class_exists('\Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController') &&
@@ -2091,6 +2475,22 @@ function cw_get_order_edit_url($order_id) {
 
 add_action('admin_notices', 'cw_contract_admin_notices');
 
+/**
+ * Affiche les notifications admin après les actions sur les contrats.
+ *
+ * Messages affichés selon les query strings :
+ * - cw_contract_generated : Succès génération
+ * - cw_contract_regenerated : Succès régénération
+ * - cw_contract_sent : Succès envoi email
+ * - cw_contract_error : Erreur génération
+ * - cw_contract_email_error : Erreur envoi email
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ *
+ * @hook admin_notices
+ */
 function cw_contract_admin_notices() {
     if (isset($_GET['cw_contract_generated'])) {
         echo '<div class="notice notice-success is-dismissible"><p>✅ Contrat généré et envoyé avec succès !</p></div>';
@@ -2115,6 +2515,22 @@ function cw_contract_admin_notices() {
 
 add_action('admin_menu', 'cw_add_contract_settings_page');
 
+/**
+ * Ajoute la page de configuration dans le menu WooCommerce.
+ *
+ * Crée un sous-menu "Contrats" sous WooCommerce permettant de :
+ * - Configurer les informations entreprise
+ * - Voir les statistiques de génération
+ * - Consulter les règles de génération automatique
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ *
+ * @hook admin_menu
+ *
+ * @see cw_render_contract_settings_page() Callback de rendu.
+ */
 function cw_add_contract_settings_page() {
     add_submenu_page(
         'woocommerce',
@@ -2126,6 +2542,20 @@ function cw_add_contract_settings_page() {
     );
 }
 
+/**
+ * Affiche la page de configuration des contrats.
+ *
+ * Fonctionnalités :
+ * - Formulaire de configuration des informations entreprise
+ * - Affichage des seuils de génération automatique
+ * - Statistiques (compteurs par année)
+ * - Chemin du répertoire de stockage
+ *
+ * @since 1.0.0
+ * @since 2.0.0 Ajout des statistiques et des règles de génération.
+ *
+ * @return void
+ */
 function cw_render_contract_settings_page() {
     // Sauvegarder les paramètres
     if (isset($_POST['cw_save_settings']) && check_admin_referer('cw_contract_settings')) {
@@ -2242,7 +2672,21 @@ function cw_render_contract_settings_page() {
 ============================================================================= */
 
 /**
- * Crée la page de vérification des contrats
+ * Crée automatiquement la page de vérification des contrats.
+ *
+ * Cette page permet à quiconque scanne le QR Code d'un contrat de
+ * vérifier son authenticité sans avoir besoin de se connecter.
+ *
+ * Crée une page WordPress avec le slug 'verifier-contrat' si elle
+ * n'existe pas déjà. La page est marquée avec une meta '_cw_verification_page'.
+ *
+ * @since 2.1.0
+ *
+ * @return void
+ *
+ * @hook init
+ *
+ * @see cw_handle_public_verification() Gère l'affichage de la page.
  */
 function cw_create_verification_page() {
     // Créer la page si elle n'existe pas
@@ -2272,7 +2716,24 @@ function cw_create_verification_page() {
 add_action('init', 'cw_create_verification_page');
 
 /**
- * Gère la vérification publique des contrats
+ * Gère l'affichage de la page de vérification publique des contrats.
+ *
+ * Recherche la commande correspondant au hash de vérification passé
+ * dans l'URL et affiche une page de confirmation avec :
+ * - Numéro de contrat
+ * - Nom du client
+ * - Date de génération
+ * - Nom de l'entreprise
+ *
+ * Si le hash n'est pas trouvé, affiche un message d'erreur.
+ *
+ * @since 2.1.0
+ *
+ * @global WP_Query $wp_query Objet de requête WordPress.
+ *
+ * @return void Termine avec exit() après affichage.
+ *
+ * @hook template_redirect (priorité 5)
  */
 function cw_handle_public_verification() {
     global $wp_query;
@@ -2540,7 +3001,22 @@ function cw_handle_public_verification() {
 add_action('template_redirect', 'cw_handle_public_verification', 5);
 
 /**
- * Ajoute la réécriture d'URL pour la vérification
+ * Enregistre les règles de réécriture d'URL pour la vérification publique.
+ *
+ * Crée une URL propre pour la vérification des contrats :
+ * - /verifier-contrat/{hash} → index.php?verification_id={hash}
+ *
+ * Le hash est généré via wp_hash() lors de la création du contrat
+ * et stocké en meta '_cw_verification_id'.
+ *
+ * @since 2.1.0
+ *
+ * @return void
+ *
+ * @hook init
+ *
+ * @see add_rewrite_rule() Ajoute la règle de réécriture.
+ * @see add_rewrite_tag()  Enregistre le tag personnalisé.
  */
 function cw_add_verification_rewrite() {
     add_rewrite_rule(
@@ -2558,15 +3034,33 @@ add_action('init', 'cw_add_verification_rewrite');
    FLUSH REWRITE RULES À L'ACTIVATION
 ============================================================================= */
 
+/**
+ * Rafraîchit les règles de réécriture lors de l'activation du plugin.
+ *
+ * Nécessaire pour que les URLs de vérification fonctionnent immédiatement
+ * après l'activation, sans avoir à sauvegarder les permalinks manuellement.
+ *
+ * @since 2.1.0
+ */
 register_activation_hook(__FILE__, function() {
     cw_add_verification_rewrite();
     flush_rewrite_rules();
 });
 
+/**
+ * Nettoie les règles de réécriture lors de la désactivation du plugin.
+ *
+ * Retire les règles personnalisées pour éviter les erreurs 404
+ * après désactivation du système de contrats.
+ *
+ * @since 2.1.0
+ */
 register_deactivation_hook(__FILE__, function() {
     flush_rewrite_rules();
 });
 
 /* =============================================================================
+   FIN DU SYSTÈME DE CONTRATS COWORKING v2.1
+============================================================================= *//* =============================================================================
    FIN DU SYSTÈME DE CONTRATS COWORKING v2.1
 ============================================================================= */
