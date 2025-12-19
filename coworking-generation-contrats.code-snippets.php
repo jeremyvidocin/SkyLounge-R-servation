@@ -1348,85 +1348,111 @@ function cw_generate_contract_pdf($order_id, $existing_number = null) {
     $relative_path = $year_month . '/' . $filename;
 
     $pdf_generated = false;
+    $pdf_error = '';
 
-    // Méthode 1: DOMPDF via WooCommerce PDF Invoices & Packing Slips
-    if (!$pdf_generated) {
-        $wcpdf_path = WP_PLUGIN_DIR . '/woocommerce-pdf-invoices-packing-slips/vendor/autoload.php';
-        if (file_exists($wcpdf_path)) {
-            try {
-                require_once $wcpdf_path;
+    // =========================================================================
+    // DÉTECTION DOMPDF - Plusieurs chemins possibles
+    // =========================================================================
+    
+    $possible_paths = [
+        // Plugin WooCommerce PDF Invoices & Packing Slips (le plus courant)
+        WP_PLUGIN_DIR . '/woocommerce-pdf-invoices-packing-slips/vendor/autoload.php',
+        // Variante avec tirets
+        WP_PLUGIN_DIR . '/wpo-wcpdf/vendor/autoload.php',
+        // Plugin DOMPDF standalone
+        WP_PLUGIN_DIR . '/dompdf/autoload.inc.php',
+        // Composer global WordPress
+        ABSPATH . 'vendor/autoload.php',
+        WP_CONTENT_DIR . '/vendor/autoload.php',
+    ];
 
-                if (class_exists('Dompdf\Dompdf')) {
-                    $options = new \Dompdf\Options();
-                    $options->set('isRemoteEnabled', true);
-                    $options->set('isHtml5ParserEnabled', true);
-                    $options->set('defaultFont', 'DejaVu Sans');
-                    $options->set('isFontSubsettingEnabled', true);
-                    $options->set('defaultMediaType', 'print');
-                    $options->set('isPhpEnabled', false);
-                    $options->set('debugCss', false);
-                    $options->set('debugLayout', false);
-
-                    $dompdf = new \Dompdf\Dompdf($options);
-                    $dompdf->loadHtml($html);
-                    $dompdf->setPaper('A4', 'portrait');
-                    $dompdf->set_option('enable_css_float', true);
-                    $dompdf->render();
-
-                    file_put_contents($filepath, $dompdf->output());
-                    $pdf_generated = true;
-
-                    error_log('CW Contract: PDF généré avec succès - ' . $contract_number);
-                }
-            } catch (Exception $e) {
-                error_log('CW Contract PDF Error: ' . $e->getMessage());
+    // Charger DOMPDF si pas encore chargé
+    if (!class_exists('Dompdf\Dompdf')) {
+        foreach ($possible_paths as $path) {
+            if (file_exists($path)) {
+                require_once $path;
+                error_log('CW Contract: DOMPDF chargé depuis ' . $path);
+                break;
             }
         }
     }
 
-    // Méthode 2: Dompdf déjà chargé
-    if (!$pdf_generated && class_exists('Dompdf\Dompdf')) {
+    // =========================================================================
+    // GÉNÉRATION PDF AVEC DOMPDF
+    // =========================================================================
+    
+    if (class_exists('Dompdf\Dompdf')) {
         try {
             $options = new \Dompdf\Options();
             $options->set('isRemoteEnabled', true);
             $options->set('isHtml5ParserEnabled', true);
             $options->set('defaultFont', 'DejaVu Sans');
+            $options->set('isFontSubsettingEnabled', true);
+            $options->set('defaultMediaType', 'print');
+            $options->set('isPhpEnabled', false);
+            $options->set('debugCss', false);
+            $options->set('debugLayout', false);
+            // Permettre le chargement des images locales
+            $options->set('chroot', [ABSPATH, WP_CONTENT_DIR]);
 
             $dompdf = new \Dompdf\Dompdf($options);
-            $dompdf->loadHtml($html);
+            $dompdf->loadHtml($html, 'UTF-8');
             $dompdf->setPaper('A4', 'portrait');
             $dompdf->render();
 
-            file_put_contents($filepath, $dompdf->output());
-            $pdf_generated = true;
+            $pdf_output = $dompdf->output();
+            
+            if ($pdf_output && strlen($pdf_output) > 100) {
+                file_put_contents($filepath, $pdf_output);
+                $pdf_generated = true;
+                error_log('CW Contract: PDF généré avec succès - ' . $contract_number . ' (' . strlen($pdf_output) . ' bytes)');
+            } else {
+                $pdf_error = 'PDF vide ou trop petit';
+                error_log('CW Contract: ' . $pdf_error);
+            }
         } catch (Exception $e) {
-            error_log('CW Contract PDF Error (direct): ' . $e->getMessage());
+            $pdf_error = $e->getMessage();
+            error_log('CW Contract PDF Error: ' . $pdf_error);
+        }
+    } else {
+        $pdf_error = 'DOMPDF non disponible - Plugin PDF Invoices & Packing Slips non installé ?';
+        error_log('CW Contract: ' . $pdf_error);
+        
+        // Lister les chemins testés pour debug
+        foreach ($possible_paths as $path) {
+            error_log('CW Contract: Chemin testé: ' . $path . ' - ' . (file_exists($path) ? 'EXISTE' : 'NON TROUVÉ'));
         }
     }
 
-    // Fallback: HTML avec bouton impression
+    // =========================================================================
+    // FALLBACK HTML (seulement si PDF impossible)
+    // =========================================================================
+    
     if (!$pdf_generated) {
         $filename = $contract_number . '.html';
         $filepath = $dir . $filename;
         $relative_path = $year_month . '/' . $filename;
 
-        // Ajouter barre d'impression
+        // Ajouter barre d'impression et message d'avertissement
         $print_bar = '
         <style>
             @media print { .print-bar { display: none !important; } .container { margin-top: 0 !important; } }
-            .print-bar { position: fixed; top: 0; left: 0; right: 0; background: #1e40af; color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; z-index: 9999; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+            .print-bar { position: fixed; top: 0; left: 0; right: 0; background: #dc2626; color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; z-index: 9999; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
             .print-bar span { font-size: 14px; }
-            .print-bar button { background: white; color: #1e40af; border: none; padding: 12px 28px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.2s; }
-            .print-bar button:hover { background: #f0f9ff; transform: scale(1.02); }
+            .print-bar button { background: white; color: #dc2626; border: none; padding: 12px 28px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+            .print-bar button:hover { background: #fef2f2; transform: scale(1.02); }
             .container { margin-top: 70px !important; }
         </style>';
 
         $html = str_replace('</head>', $print_bar . '</head>', $html);
-        $html = str_replace('<body>', '<body><div class="print-bar"><span>Contrat ' . esc_html($contract_number) . '</div>', $html);
+        $html = str_replace('<body>', '<body><div class="print-bar"><span>⚠️ Version HTML - ' . esc_html($contract_number) . ' | Erreur: ' . esc_html($pdf_error) . '</span><button onclick="window.print()">Imprimer en PDF</button></div>', $html);
 
         file_put_contents($filepath, $html);
 
-        error_log('CW Contract: Fallback HTML généré - ' . $contract_number);
+        error_log('CW Contract: Fallback HTML généré - ' . $contract_number . ' (Raison: ' . $pdf_error . ')');
+        
+        // Notification admin
+        set_transient('cw_pdf_fallback_warning', true, DAY_IN_SECONDS);
     }
 
     // Hash pour vérification

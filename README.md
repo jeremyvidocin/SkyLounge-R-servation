@@ -29,9 +29,9 @@
 
 ### 🎯 Côté Client
 - 📅 Calendrier interactif avec disponibilités temps réel
-- 💳 Paiement sécurisé via WooCommerce
-- 📧 Confirmation par email automatique
-- 📄 Contrat PDF généré automatiquement
+- 💳 Paiement sécurisé via WooCommerce (checkout invité)
+- 📧 Confirmation par email automatique (pas de création de compte)
+- 📄 Contrat PDF généré et envoyé par email
 - 🔒 Système de lock anti-double réservation
 
 </td>
@@ -57,8 +57,8 @@
 │                              🖥️  FRONTEND                                   │
 │                                                                             │
 │    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐       │
-│    │   Calendrier    │    │    Checkout     │    │  Espace Client  │       │
-│    │   (Vanilla JS)  │    │  (WooCommerce)  │    │   (Mon Compte)  │       │
+│    │   Calendrier    │    │    Checkout     │    │  Confirmation   │       │
+│    │   (Vanilla JS)  │    │    (Invité)     │    │   (Email+PDF)   │       │
 │    └────────┬────────┘    └────────┬────────┘    └────────┬────────┘       │
 │             │                      │                      │                 │
 └─────────────┼──────────────────────┼──────────────────────┼─────────────────┘
