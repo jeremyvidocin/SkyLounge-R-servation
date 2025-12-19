@@ -1,15 +1,27 @@
 # POLITIQUE DE CONFIDENTIALITÉ
 ## SkyLounge Coworking
 
-**Dernière mise à jour : Décembre 2025**
+**Site web :** https://skyloungefwi.fr  
+**Dernière mise à jour :** 19 décembre 2025
+
+---
+
+## QUI SOMMES-NOUS ?
+
+L'adresse de notre site est : **https://skyloungefwi.fr**
+
+SkyLounge est un espace de coworking professionnel proposant des espaces de travail flexibles (bureaux, salles de réunion) avec un système de réservation en ligne.
 
 ---
 
 ## INTRODUCTION
 
-La présente Politique de Confidentialité décrit comment **[RAISON SOCIALE]** (ci-après "SkyLounge", "nous", "notre") collecte, utilise et protège les données personnelles des utilisateurs de notre site internet et de nos services de réservation d'espaces de coworking.
+La présente Politique de Confidentialité décrit comment **SkyLounge Coworking** (ci-après "SkyLounge", "nous", "notre") collecte, utilise et protège les données personnelles des utilisateurs de notre site internet et de nos services de réservation d'espaces de coworking.
 
-Nous nous engageons à respecter votre vie privée et à traiter vos données personnelles conformément au **Règlement Général sur la Protection des Données (RGPD - UE 2016/679)** et à la **Loi Informatique et Libertés**.
+Nous nous engageons à respecter votre vie privée et à traiter vos données personnelles conformément au :
+- **Règlement Général sur la Protection des Données (RGPD - UE 2016/679)**
+- **Loi Informatique et Libertés (modifiée)**
+- **Code de la consommation**
 
 ---
 
@@ -17,10 +29,15 @@ Nous nous engageons à respecter votre vie privée et à traiter vos données pe
 
 Le responsable du traitement des données personnelles est :
 
-**[RAISON SOCIALE]**
-[Adresse complète]
-Email : [EMAIL DE CONTACT]
-Téléphone : [TÉLÉPHONE]
+**SkyLounge Coworking**  
+_[À compléter avec vos informations]_
+
+- **Adresse :** [Votre adresse complète]
+- **Email :** contact@skyloungefwi.fr
+- **Téléphone :** [Votre numéro]
+- **SIRET :** [Votre SIRET]
+
+Pour toute question relative à la protection de vos données personnelles, vous pouvez nous contacter à l'adresse : **rgpd@skyloungefwi.fr**
 
 ---
 
@@ -28,26 +45,34 @@ Téléphone : [TÉLÉPHONE]
 
 ### 2.1 Données collectées lors d'une réservation
 
+Lorsque vous effectuez une réservation sur notre plateforme, nous collectons les informations suivantes :
+
 | Donnée | Finalité | Base légale |
 |--------|----------|-------------|
-| Nom et prénom | Identification, contrat | Exécution du contrat |
-| Adresse email | Confirmation, communication | Exécution du contrat |
-| Numéro de téléphone | Contact si besoin | Exécution du contrat |
-| Adresse IP (anonymisée) | Sécurité, preuve consentement | Intérêt légitime |
-| Date/heure consentement RGPD | Preuve légale | Obligation légale |
-| Données de paiement* | Transaction | Exécution du contrat |
+| **Nom et prénom** | Identification client, génération contrat | Exécution du contrat |
+| **Adresse email** | Envoi confirmations, contrat, communications | Exécution du contrat |
+| **Numéro de téléphone** | Contact en cas de besoin, urgences | Exécution du contrat |
+| **Adresse postale** | Facturation, génération contrat | Exécution du contrat |
+| **Nom de l'entreprise** (optionnel) | Facturation professionnelle | Exécution du contrat |
+| **Dates et horaires de réservation** | Gestion planning, accès | Exécution du contrat |
+| **Type d'espace réservé** | Prestation de service | Exécution du contrat |
+| **Montant et historique paiements** | Comptabilité, facturation | Obligation légale |
+| **Adresse IP** | Sécurité, preuve du consentement | Intérêt légitime |
+| **Date/heure consentement RGPD** | Preuve légale conformité | Obligation légale |
 
-*Les données de paiement (numéro de carte) sont traitées exclusivement par notre prestataire de paiement sécurisé et ne sont jamais stockées sur nos serveurs.
+**🔒 Données bancaires :** Les informations de carte bancaire sont traitées exclusivement par notre prestataire de paiement sécurisé (WooCommerce Payments / Stripe) conforme PCI-DSS. Elles ne sont **jamais stockées** sur nos serveurs.
 
-### 2.2 Données collectées automatiquement
+### 2.2 Données collectées automatiquement (navigation)
 
 Lors de votre navigation sur notre site, nous collectons automatiquement :
-- Adresse IP (anonymisée : dernier octet masqué)
-- Type de navigateur et système d'exploitation
-- Pages visitées et durée de visite
-- Source de la visite (moteur de recherche, lien direct)
 
-Ces données sont collectées à des fins de statistiques et d'amélioration du service.
+- **Adresse IP** (anonymisée : dernier octet masqué)
+- **Type de navigateur et système d'exploitation**
+- **Pages visitées et durée de visite**
+- **Source de la visite** (moteur de recherche, lien direct)
+- **Données de session** (panier de réservation temporaire)
+
+**Finalité :** Statistiques de fréquentation, amélioration de l'expérience utilisateur, sécurité du site.
 
 ### 2.3 Cookies
 
@@ -253,59 +278,183 @@ Email : <a href="mailto:[EMAIL]">[EMAIL]</a></p>
 </tr>
 </table>
 
-<h2 style="color: #1e73be;">5. Vos droits</h2>
+**Pour exercer vos droits, contactez-nous :**
+- Email : **rgpd@skyloungefwi.fr**
+- Courrier : SkyLounge Coworking, [Votre adresse]
 
-<p>Conformément au RGPD, vous pouvez :</p>
+**Délai de réponse :** 30 jours maximum
 
-<ul>
-<li><strong>Accéder</strong> à vos données</li>
-<li><strong>Rectifier</strong> des informations incorrectes</li>
-<li><strong>Supprimer</strong> vos données ("droit à l'oubli")</li>
-<li><strong>Limiter</strong> le traitement</li>
-<li><strong>Récupérer</strong> vos données (portabilité)</li>
-<li><strong>Vous opposer</strong> au traitement</li>
-</ul>
-
-<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-<strong>📧 Pour exercer vos droits :</strong><br>
-Envoyez un email à <a href="mailto:[EMAIL]">[EMAIL]</a><br>
-Réponse sous 30 jours maximum.
-</div>
-
-<h2 style="color: #1e73be;">6. Sécurité</h2>
-<ul>
-<li>🔒 Connexion HTTPS sécurisée</li>
-<li>🔒 Données stockées sur des serveurs européens</li>
-<li>🔒 Adresse IP anonymisée</li>
-<li>🔒 Accès restreint au personnel autorisé</li>
-</ul>
-
-<h2 style="color: #1e73be;">7. Cookies</h2>
-<p>Nous utilisons des cookies pour le fonctionnement du site. Vous pouvez gérer vos préférences via le bandeau cookies.</p>
-
-<h2 style="color: #1e73be;">8. Réclamations</h2>
-<p>Si vous estimez que vos droits ne sont pas respectés, vous pouvez contacter la CNIL :</p>
-<p><strong>CNIL</strong> - 3 Place de Fontenoy, 75334 Paris - <a href="https://www.cnil.fr" target="_blank">www.cnil.fr</a></p>
-
-<h2 style="color: #1e73be;">9. Contact</h2>
-<div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
-<p><strong>[RAISON SOCIALE]</strong><br>
-[Adresse]<br>
-Email : <a href="mailto:[EMAIL]">[EMAIL]</a><br>
-Téléphone : [TÉLÉPHONE]</p>
-</div>
-
-</div>
-```
+**Pièces à fournir :** Copie d'une pièce d'identité pour vérifier votre identité.
 
 ---
 
-# CHECKLIST AVANT PUBLICATION
+## 7. SÉCURITÉ DES DONNÉES
 
-- [ ] `[RAISON SOCIALE]` → Nom de l'entreprise
-- [ ] `[ADRESSE]` → Adresse complète
-- [ ] `[EMAIL]` → Email de contact RGPD
-- [ ] `[EMAIL DE CONTACT]` → Email général
-- [ ] `[TÉLÉPHONE]` → Numéro de contact
-- [ ] Créer la page `/politique-confidentialite` sur WordPress
-- [ ] Vérifier que le lien fonctionne depuis la checkbox RGPD du checkout
+Nous mettons en œuvre des mesures techniques et organisationnelles pour protéger vos données :
+
+### Mesures techniques
+- 🔒 **Connexion HTTPS** sécurisée (certificat SSL)
+- 🔒 **Chiffrement** des données sensibles en base
+- 🔒 **Sauvegarde quotidienne** automatique
+- 🔒 **Pare-feu** et protection anti-intrusion
+- 🔒 **Mises à jour** de sécurité régulières
+
+### Mesures organisationnelles
+- 👥 **Accès restreint** au personnel autorisé uniquement
+- 📝 **Registre des traitements** conforme RGPD
+- 🔐 **Mots de passe** complexes et renouvelés
+- 📊 **Audits** de sécurité réguliers
+
+**Hébergement :** Nos données sont hébergées sur des serveurs sécurisés situés dans l'Union Européenne.
+
+---
+
+## 8. COOKIES ET TECHNOLOGIES SIMILAIRES
+
+### 8.1 Qu'est-ce qu'un cookie ?
+
+Un cookie est un petit fichier texte déposé sur votre navigateur lors de votre visite sur notre site.
+
+### 8.2 Cookies utilisés sur notre site
+
+| Type de cookie | Nom | Finalité | Durée |
+|----------------|-----|----------|-------|
+| **Essentiels** | `wordpress_*`, `wp-settings-*` | Fonctionnement du site, connexion | Session |
+| **Panier** | `woocommerce_cart_hash` | Mémorisation du panier | 2 jours |
+| **Session** | `woocommerce_items_in_cart` | Gestion de la réservation | Session |
+| **Consentement** | `cookie_consent` | Mémorisation de votre choix cookies | 12 mois |
+
+### 8.3 Gestion des cookies
+
+Vous pouvez gérer vos préférences cookies :
+- Via le **bandeau cookies** affiché lors de votre première visite
+- En modifiant les **paramètres de votre navigateur**
+  - Chrome : Paramètres > Confidentialité > Cookies
+  - Firefox : Options > Vie privée > Cookies
+  - Safari : Préférences > Confidentialité > Cookies
+
+⚠️ **Attention :** Le refus des cookies essentiels peut empêcher le bon fonctionnement de la réservation en ligne.
+
+---
+
+## 9. COMMENTAIRES SUR LE SITE
+
+Quand vous laissez un commentaire sur notre site, les données inscrites dans le formulaire de commentaire, ainsi que **votre adresse IP** et **l'agent utilisateur de votre navigateur** sont collectés pour nous aider à la détection des commentaires indésirables.
+
+Une chaîne anonymisée créée à partir de votre adresse e-mail (également appelée **hash**) peut être envoyée au service **Gravatar** pour vérifier si vous utilisez ce dernier. Les clauses de confidentialité du service Gravatar sont disponibles ici : https://automattic.com/privacy/
+
+Après validation de votre commentaire, votre photo de profil sera visible publiquement à côté de votre commentaire.
+
+**Conservation :** Les commentaires et leurs métadonnées sont conservés indéfiniment. Cela permet de reconnaître et approuver automatiquement les commentaires suivants au lieu de les laisser dans la file de modération.
+
+---
+
+## 10. MÉDIAS ET IMAGES
+
+Si vous téléversez des images sur le site, nous vous conseillons d'**éviter de téléverser des images contenant des données EXIF de coordonnées GPS**. Les visiteurs du site peuvent télécharger et extraire des données de localisation depuis ces images.
+
+**Conseil :** Supprimez les métadonnées EXIF avant de téléverser une photo (outils : Photoshop, GIMP, ou sites comme verexif.com).
+
+---
+
+## 11. CONTENU EMBARQUÉ DEPUIS D'AUTRES SITES
+
+Les articles de ce site peuvent inclure des **contenus intégrés** (par exemple des vidéos YouTube, cartes Google Maps, etc.).
+
+Le contenu intégré depuis d'autres sites se comporte de la même manière que si le visiteur se rendait sur cet autre site.
+
+**Ces sites web pourraient :**
+- Collecter des données sur vous
+- Utiliser des cookies
+- Embarquer des outils de suivi tiers
+- Suivre vos interactions avec ces contenus embarqués si vous disposez d'un compte connecté sur leur site
+
+**Contenus tiers utilisés :**
+- YouTube (vidéos) - [Politique](https://policies.google.com/privacy)
+- Google Maps (plans) - [Politique](https://policies.google.com/privacy)
+
+---
+
+## 12. UTILISATION ET TRANSMISSION DE VOS DONNÉES
+
+### Réinitialisation de mot de passe
+Si vous demandez une réinitialisation de votre mot de passe, **votre adresse IP** sera incluse dans l'e-mail de réinitialisation pour des raisons de sécurité.
+
+### Transferts hors UE
+Vos données personnelles ne sont **pas transférées hors de l'Union Européenne**. Tous nos prestataires sont situés dans l'UE ou disposent de garanties appropriées (clauses contractuelles types).
+
+### Détection de spam
+Les commentaires des visiteurs peuvent être vérifiés à l'aide d'un service automatisé de détection des commentaires indésirables (Akismet). Les données transmises incluent le texte du commentaire, l'email, le nom, l'adresse IP et l'agent utilisateur.
+
+---
+
+## 13. COMPTES UTILISATEURS
+
+Pour les comptes qui s'inscrivent sur notre site, nous stockons également les **données personnelles indiquées dans leur profil**.
+
+Tous les comptes peuvent :
+- ✅ **Voir** leurs informations personnelles à tout moment
+- ✅ **Modifier** leurs informations personnelles
+- ✅ **Supprimer** leurs informations personnelles (à l'exception de leur identifiant)
+
+**Accès administrateur :** Les gestionnaires du site peuvent aussi voir et modifier ces informations pour le support client.
+
+---
+
+## 14. RÉCLAMATIONS
+
+Si vous estimez que vos droits en matière de protection des données ne sont pas respectés, vous pouvez introduire une réclamation auprès de la **Commission Nationale de l'Informatique et des Libertés (CNIL)** :
+
+**CNIL**  
+3 Place de Fontenoy  
+TSA 80715  
+75334 Paris Cedex 07  
+
+**Téléphone :** 01 53 73 22 22  
+**Site web :** https://www.cnil.fr  
+**Formulaire de réclamation en ligne :** https://www.cnil.fr/fr/plaintes
+
+---
+
+## 15. MODIFICATIONS DE CETTE POLITIQUE
+
+Nous nous réservons le droit de modifier cette politique de confidentialité à tout moment.
+
+**En cas de modification substantielle**, nous vous en informerons :
+- Par une notification sur le site
+- Par email si vous avez un compte client
+
+**Dernière mise à jour :** 19 décembre 2025
+
+---
+
+## 16. CONTACT
+
+Pour toute question concernant cette politique de confidentialité ou l'exercice de vos droits :
+
+**SkyLounge Coworking**  
+_[À compléter]_
+
+- **Email RGPD :** rgpd@skyloungefwi.fr  
+- **Email général :** contact@skyloungefwi.fr  
+- **Téléphone :** [Votre numéro]  
+- **Courrier :** [Votre adresse postale complète]
+
+**Délai de réponse :** Nous nous engageons à répondre à toute demande dans un délai maximum de **30 jours**.
+
+---
+
+## ANNEXE : GLOSSAIRE RGPD
+
+| Terme | Définition |
+|-------|------------|
+| **Donnée personnelle** | Toute information se rapportant à une personne physique identifiée ou identifiable |
+| **Traitement** | Toute opération effectuée sur des données (collecte, enregistrement, utilisation, etc.) |
+| **Responsable de traitement** | Entité qui détermine les finalités et moyens du traitement |
+| **Sous-traitant** | Entité qui traite des données pour le compte du responsable |
+| **RGPD** | Règlement Général sur la Protection des Données (UE 2016/679) |
+| **CNIL** | Commission Nationale de l'Informatique et des Libertés |
+
+---
+
+**📄 Document officiel - Version 1.0**
