@@ -1,91 +1,62 @@
 <?php
 
 /**
+ * Coworking Génération Contrats
+ */
+/**
  * =============================================================================
- * COWORKING CONTRACT SYSTEM - GÉNÉRATION DE CONTRATS PDF
+ * COWORKING CONTRACT SYSTEM - VERSION 2.0 PREMIUM
  * =============================================================================
  *
- * Système complet de génération automatique de contrats PDF professionnels
- * pour les réservations d'espaces de coworking.
+ * Système complet de génération automatique de contrats PDF pour les
+ * réservations d'espaces de coworking.
  *
- * FONCTIONNALITÉS :
- * - Génération automatique après paiement (si seuils atteints)
- * - Template HTML premium avec design professionnel
- * - Conversion en PDF via plugin WPO WCPDF
+ * FONCTIONNALITÉS:
+ * - Génération automatique de contrats PDF professionnels
  * - Envoi par email avec pièce jointe
  * - Accès client via "Mon compte" WooCommerce
- * - Interface admin avec métabox dédiée
- * - Numérotation séquentielle des contrats (CW-YYYY-NNNNN)
+ * - Interface admin complète avec metabox
+ * - Page de configuration des informations entreprise
+ * - Numérotation séquentielle des contrats
  *
- * CONDITIONS DE GÉNÉRATION (AU MOINS UNE) :
- * - Durée >= 7 jours
- * - Montant >= 200 EUR
- * - Formule "semaine" ou "mois"
- *
- * PRÉREQUIS :
+ * PRÉREQUIS:
+ * - Plugin "PDF Invoices & Packing Slips for WooCommerce" (WPO WCPDF)
  * - WooCommerce actif
  * - ACF Pro pour les champs personnalisés
- * - (Optionnel) Plugin "PDF Invoices & Packing Slips for WooCommerce"
- *   pour la génération PDF (sinon fallback HTML)
  *
- * @package    SkyLounge_Coworking
- * @subpackage Contracts
- * @author     Jérémy VIDOCIN
- * @since      1.0.0
- * @version    2.0.0
- *
- * @see cw_should_generate_contract()  Vérifie si un contrat doit être généré
- * @see cw_generate_contract_html()    Génère le template HTML du contrat
- * @see cw_generate_contract_pdf()     Génère le PDF final
+ * @version 2.1
+ * @author Coworking System
  */
 
-// Sécurité : empêcher l'accès direct au fichier
+// Sécurité: empêcher l'accès direct
 if (!defined('ABSPATH')) {
     exit;
 }
 
 /* =============================================================================
-   SECTION 1 : CONFIGURATION & CONSTANTES
-   =============================================================================
-   Définition des constantes de configuration du système de contrats.
+   CONFIGURATION & CONSTANTES
 ============================================================================= */
 
-/**
- * Version du système de contrats.
- * Incrémentée à chaque modification majeure du template.
- */
-define('CW_CONTRACT_VERSION', '2.0');
+// Version du système
+define('CW_CONTRACT_VERSION', '2.1');
 
-/**
- * Répertoire de stockage des contrats PDF.
- * Protégé par .htaccess pour empêcher l'accès direct.
- */
+// Répertoire de stockage des contrats
 define('CW_CONTRACT_DIR', WP_CONTENT_DIR . '/uploads/coworking-contracts/');
 define('CW_CONTRACT_URL', WP_CONTENT_URL . '/uploads/coworking-contracts/');
 
-/**
- * Seuils pour la génération automatique de contrat.
- * Un contrat est généré si AU MOINS UNE de ces conditions est remplie.
- */
-define('CW_CONTRACT_MIN_DAYS', 7);                    // Durée minimum en jours
-define('CW_CONTRACT_MIN_AMOUNT', 200);                // Montant minimum en EUR
-define('CW_CONTRACT_FORMULAS', ['mois', 'semaine']); // Formules qui génèrent toujours
+// Seuils pour génération automatique de contrat
+// Un contrat sera généré si AU MOINS UNE de ces conditions est remplie:
+define('CW_CONTRACT_MIN_DAYS', 7);       // Générer si >= 7 jours
+define('CW_CONTRACT_MIN_AMOUNT', 200);   // OU si >= 200 EUR
+define('CW_CONTRACT_FORMULAS', ['mois', 'semaine']); // OU si formule dans cette liste
 
 /* =============================================================================
-   SECTION 2 : INFORMATIONS ENTREPRISE
-   =============================================================================
-   Récupération des informations légales de l'entreprise pour le contrat.
+   INFORMATIONS ENTREPRISE
 ============================================================================= */
 
 /**
- * Récupère les informations de l'entreprise pour le contrat.
- *
- * Les valeurs sont stockées en options WordPress et configurables
- * via WooCommerce > Contrats Coworking.
- *
- * @since 1.0.0
- *
- * @return array Tableau associatif avec les informations entreprise.
+ * Récupère les informations de l'entreprise pour le contrat
+ * Ces valeurs sont configurables via WooCommerce > Contrats Coworking
  */
 function cw_get_company_info() {
     return [
@@ -103,33 +74,21 @@ function cw_get_company_info() {
 }
 
 /* =============================================================================
-   SECTION 3 : INITIALISATION
-   =============================================================================
-   Création du répertoire de stockage sécurisé au démarrage de WordPress.
+   INITIALISATION - Création du répertoire de stockage
 ============================================================================= */
 
-/**
- * Crée le répertoire de stockage des contrats avec protections de sécurité.
- *
- * Sécurisations appliquées :
- * - .htaccess : Bloque l'accès direct aux fichiers
- * - index.php : Empêche le listing du répertoire
- *
- * @since 1.0.0
- * @hook init
- */
 add_action('init', function() {
     // Créer le répertoire si nécessaire
     if (!file_exists(CW_CONTRACT_DIR)) {
         wp_mkdir_p(CW_CONTRACT_DIR);
 
-        // Protection .htaccess (bloque l'accès HTTP direct)
+        // Protection .htaccess (empêche l'accès direct aux fichiers)
         $htaccess = CW_CONTRACT_DIR . '.htaccess';
         if (!file_exists($htaccess)) {
             file_put_contents($htaccess, "Options -Indexes\nDeny from all");
         }
 
-        // Index.php de sécurité (empêche le listing)
+        // Index.php de sécurité
         $index = CW_CONTRACT_DIR . 'index.php';
         if (!file_exists($index)) {
             file_put_contents($index, '<?php // Silence is golden');
@@ -138,15 +97,9 @@ add_action('init', function() {
 });
 
 /* =============================================================================
-   SECTION 4 : NOTIFICATIONS ADMIN
-   ============================================================================= */
+   NOTIFICATIONS ADMIN - PDF FALLBACK WARNING
+============================================================================= */
 
-/**
- * Affiche une notification si le plugin PDF n'est pas installé.
- *
- * @since 2.0.0
- * @hook admin_notices
- */
 add_action('admin_notices', function() {
     // Notification si fallback HTML utilisé (plugin PDF absent)
     if (get_transient('cw_pdf_fallback_warning')) {
@@ -159,30 +112,17 @@ add_action('admin_notices', function() {
 });
 
 /* =============================================================================
-   SECTION 5 : NUMÉROTATION DES CONTRATS
-   =============================================================================
-   Génération de numéros de contrat uniques et séquentiels.
+   NUMÉROTATION DES CONTRATS
 ============================================================================= */
 
 /**
- * Génère un numéro de contrat unique et séquentiel.
- *
- * Format : CW-YYYY-NNNNN (ex: CW-2025-00042)
- * Le compteur est réinitialisé chaque année.
- *
- * @since 1.0.0
- *
- * @return string Le numéro de contrat généré.
- *
- * @example
- * $number = cw_generate_contract_number();
- * // 'CW-2025-00001' (premier contrat de 2025)
+ * Génère un numéro de contrat unique
+ * Format: CW-YYYY-NNNNN (ex: CW-2025-00001)
  */
 function cw_generate_contract_number() {
     $year = date('Y');
     $option_key = 'cw_contract_counter_' . $year;
 
-    // Incrémenter le compteur de manière atomique
     $counter = (int) get_option($option_key, 0);
     $counter++;
     update_option($option_key, $counter);
@@ -191,18 +131,7 @@ function cw_generate_contract_number() {
 }
 
 /**
- * Vérifie si un contrat doit être généré pour cette commande.
- *
- * Conditions (AU MOINS UNE doit être vraie) :
- * 1. Formule dans la liste CW_CONTRACT_FORMULAS
- * 2. Durée totale >= CW_CONTRACT_MIN_DAYS jours
- * 3. Montant total >= CW_CONTRACT_MIN_AMOUNT EUR
- *
- * @since 1.0.0
- *
- * @param int $order_id L'ID de la commande WooCommerce.
- *
- * @return bool True si un contrat doit être généré.
+ * Vérifie si un contrat doit être généré pour cette commande
  */
 function cw_should_generate_contract($order_id) {
     $order = wc_get_order($order_id);
@@ -216,16 +145,11 @@ function cw_should_generate_contract($order_id) {
         $quantity = (int) ($item->get_meta('_cw_quantity') ?: 1);
         $price    = (float) ($item->get_meta('_cw_price') ?: $item->get_total());
 
-        // Mapping formule → jours
-        $bloc_days = [
-            'journee'     => 1,
-            'demi_journee'=> 0.5,
-            'semaine'     => 7,
-            'mois'        => 30
-        ];
+        // Calcul du nombre de jours
+        $bloc_days = ['journee' => 1, 'demi_journee' => 0.5, 'semaine' => 7, 'mois' => 30];
         $total_days = ($bloc_days[$formule] ?? 1) * $quantity;
 
-        // Vérification des seuils (OU logique)
+        // Vérification des seuils - si AU MOINS UN est atteint, on génère
         if (in_array($formule, CW_CONTRACT_FORMULAS)) return true;
         if ($total_days >= CW_CONTRACT_MIN_DAYS) return true;
         if ($price >= CW_CONTRACT_MIN_AMOUNT) return true;
@@ -235,28 +159,11 @@ function cw_should_generate_contract($order_id) {
 }
 
 /* =============================================================================
-   SECTION 6 : TEMPLATE HTML DU CONTRAT
-   =============================================================================
-   Génération du template HTML premium avec design professionnel.
-   Ce template est ensuite converti en PDF par DOMPDF via WPO WCPDF.
+   TEMPLATE HTML DU CONTRAT - DESIGN PREMIUM CORRIGÉ
 ============================================================================= */
 
 /**
- * Génère le HTML complet du contrat avec design professionnel.
- *
- * Ce template utilise :
- * - CSS inline pour compatibilité DOMPDF
- * - Palette de couleurs SkyLounge
- * - Structure multi-pages avec pagination automatique
- * - QR Code pour vérification
- * - Tableaux récapitulatifs
- *
- * @since 1.0.0
- *
- * @param int    $order_id        L'ID de la commande WooCommerce.
- * @param string $contract_number Le numéro de contrat généré.
- *
- * @return string Le HTML complet du contrat, prêt pour conversion PDF.
+ * Génère le HTML du contrat avec un design professionnel
  */
 function cw_generate_contract_html($order_id, $contract_number) {
     $order = wc_get_order($order_id);
@@ -289,14 +196,16 @@ function cw_generate_contract_html($order_id, $contract_number) {
     $bloc_days = ['journee' => 1, 'demi_journee' => 0.5, 'semaine' => 7, 'mois' => 30];
     $total_days = ($bloc_days[$reservation_data['formule']] ?? 1) * $reservation_data['quantity'];
 
-    // Labels
+    // Labels corrigés pour le français
     $formule_labels = [
-        'demi_journee' => 'Demi-journée',
-        'journee' => 'Journée',
-        'semaine' => 'Semaine',
-        'mois'    => 'Mois'
+        'demi_journee' => ['singular' => 'Demi-journée', 'plural' => 'Demi-journées'],
+        'journee'      => ['singular' => 'Journée', 'plural' => 'Journées'],
+        'semaine'      => ['singular' => 'Semaine', 'plural' => 'Semaines'],
+        'mois'         => ['singular' => 'Mois', 'plural' => 'Mois'] // Pas de 's' au pluriel
     ];
-    $formule_label = $formule_labels[$reservation_data['formule']] ?? ucfirst($reservation_data['formule']);
+
+    $formule_label = $formule_labels[$reservation_data['formule']] ?? ['singular' => 'Unité', 'plural' => 'Unités'];
+    $formule_display = $reservation_data['quantity'] > 1 ? $formule_label['plural'] : $formule_label['singular'];
 
     // Client
     $client_name    = $order->get_formatted_billing_full_name();
@@ -318,15 +227,13 @@ function cw_generate_contract_html($order_id, $contract_number) {
         $reservation_data['unit_price'] = $reservation_data['total_price'] / $reservation_data['quantity'];
     }
 
-    // URL de vérification pour le QR Code
-    $verification_url = add_query_arg([
-        'action' => 'cw_verify_contract',
-        'contract' => $contract_number,
-        'order' => $order_id
-    ], admin_url('admin-ajax.php'));
+    // URL de vérification sécurisée (sans admin-ajax visible)
+    $verification_id = wp_hash($order_id . $contract_number . wp_salt());
+    update_post_meta($order_id, '_cw_verification_id', $verification_id);
+    $verification_url = home_url('/verifier-contrat/' . $verification_id);
     
-    // QR Code via API Google Charts (ou remplacer par votre solution)
-    $qr_code_url = 'https://chart.googleapis.com/chart?chs=100x100&cht=qr&chl=' . urlencode($verification_url) . '&choe=UTF-8';
+    // QR Code via QuickChart (alternative à Google Charts)
+    $qr_code_url = 'https://quickchart.io/qr?size=100&text=' . urlencode($verification_url);
 
     // Coordonnées d'urgence (à personnaliser)
     $emergency_phone = get_option('cw_emergency_phone', $company['phone']);
@@ -348,27 +255,26 @@ function cw_generate_contract_html($order_id, $contract_number) {
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contrat <?php echo esc_html($contract_number); ?></title>
     <style>
         /* =====================================================================
-           DOMPDF - PAGINATION CORRECTE AVEC FOOTER AUTOMATIQUE
+           DOMPDF - PAGINATION CORRECTE
         ===================================================================== */
         @page {
             size: A4;
-            margin: 15mm 15mm 25mm 15mm; /* Plus de marge en bas pour le footer */
+            margin: 15mm 15mm 25mm 15mm;
+            @bottom-center {
+                content: "Contrat n°<?php echo esc_html($contract_number); ?> — Page " counter(page) " sur " counter(pages);
+                font-size: 7.5pt;
+                color: #64748b;
+                font-family: 'Segoe UI', sans-serif;
+                margin-bottom: 10mm;
+            }
         }
 
-        /* Footer fixe en bas de CHAQUE page via @page */
-        @page {
-            footer: page-footer;
-        }
-
-        /* Compteur de pages */
-        .page-number:before {
-            content: counter(page);
-        }
-        .page-total:before {
-            content: counter(pages);
+        body {
+            counter-reset: page 1;
         }
 
         * {
@@ -383,33 +289,8 @@ function cw_generate_contract_html($order_id, $contract_number) {
             line-height: 1.5;
             color: #1e293b;
             background: #fff;
-        }
-
-        /* Footer automatique (positionné par DOMPDF) */
-        #page-footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 20mm;
-            padding: 8px 15mm;
-            border-top: 2px solid <?php echo $brand_primary; ?>;
-            font-size: 7.5pt;
-            text-align: center;
-            color: #64748b;
-            line-height: 1.5;
-            background: #fff;
-        }
-
-        #page-footer .footer-company {
-            font-weight: 600;
-            color: <?php echo $brand_primary; ?>;
-        }
-
-        #page-footer .footer-page {
-            margin-top: 4px;
-            font-size: 8pt;
-            color: <?php echo $brand_secondary; ?>;
+            margin: 0;
+            padding: 0;
         }
 
         /* =====================================================================
@@ -421,6 +302,7 @@ function cw_generate_contract_html($order_id, $contract_number) {
             padding: 0 0 18px 0;
             border-bottom: 3px solid <?php echo $brand_primary; ?>;
             margin-bottom: 20px;
+            page-break-after: avoid;
         }
 
         .header-left {
@@ -493,6 +375,7 @@ function cw_generate_contract_html($order_id, $contract_number) {
             padding: 15px 0;
             border-top: 1px solid <?php echo $brand_border; ?>;
             border-bottom: 1px solid <?php echo $brand_border; ?>;
+            page-break-after: avoid;
         }
 
         .main-title h1 {
@@ -535,6 +418,7 @@ function cw_generate_contract_html($order_id, $contract_number) {
             padding: 8px 12px;
             background: <?php echo $brand_light; ?>;
             border-left: 4px solid <?php echo $brand_accent; ?>;
+            page-break-after: avoid;
         }
 
         .article-content {
@@ -554,6 +438,7 @@ function cw_generate_contract_html($order_id, $contract_number) {
             display: table;
             width: 100%;
             margin: 12px 0;
+            page-break-inside: avoid;
         }
 
         .party-box {
@@ -624,6 +509,7 @@ function cw_generate_contract_html($order_id, $contract_number) {
             border-collapse: collapse;
             margin: 12px 0;
             font-size: 9.5pt;
+            page-break-inside: avoid;
         }
 
         .data-table th,
@@ -694,6 +580,7 @@ function cw_generate_contract_html($order_id, $contract_number) {
             border: 2px solid <?php echo $brand_primary; ?>;
             margin: 15px 0;
             background: #fff;
+            page-break-inside: avoid;
         }
 
         .legal-notice-header {
@@ -730,6 +617,7 @@ function cw_generate_contract_html($order_id, $contract_number) {
             border-left: 4px solid <?php echo $brand_accent; ?>;
             padding: 12px 15px;
             margin: 15px 0;
+            page-break-inside: avoid;
         }
 
         .emergency-title {
@@ -775,16 +663,6 @@ function cw_generate_contract_html($order_id, $contract_number) {
             page-break-before: auto;
         }
 
-        /* S'assurer que les tableaux ne sont pas coupés */
-        .data-table, .parties-grid {
-            page-break-inside: avoid;
-        }
-
-        /* La zone légale doit rester ensemble */
-        .legal-notice {
-            page-break-inside: avoid;
-        }
-
         .signatures-title {
             font-size: 10pt;
             font-weight: 700;
@@ -809,6 +687,7 @@ function cw_generate_contract_html($order_id, $contract_number) {
         .signatures-grid {
             display: table;
             width: 100%;
+            page-break-inside: avoid;
         }
 
         .signature-box {
@@ -868,11 +747,6 @@ function cw_generate_contract_html($order_id, $contract_number) {
         }
 
         /* =====================================================================
-           PIED DE PAGE - SUPPRIMÉ (géré par #page-footer fixe)
-           Les footers manuels sont supprimés pour éviter les doublons
-        ===================================================================== */
-
-        /* =====================================================================
            PAGE 2 - CONDITIONS GÉNÉRALES
         ===================================================================== */
         .page-break {
@@ -884,6 +758,7 @@ function cw_generate_contract_html($order_id, $contract_number) {
             margin-bottom: 20px;
             padding-bottom: 15px;
             border-bottom: 2px solid <?php echo $brand_primary; ?>;
+            page-break-after: avoid;
         }
 
         .conditions-header h2 {
@@ -931,16 +806,24 @@ function cw_generate_contract_html($order_id, $contract_number) {
         .text-right { text-align: right; }
         .mt-10 { margin-top: 10px; }
         .mb-10 { margin-bottom: 10px; }
+        
+        /* =====================================================================
+           ÉVITER LES COUPURES MALHEUREUSES
+        ===================================================================== */
+        .keep-together {
+            page-break-inside: avoid;
+        }
+        
+        .break-before {
+            page-break-before: always;
+        }
+        
+        .break-after {
+            page-break-after: always;
+        }
     </style>
 </head>
 <body>
-
-    <!-- FOOTER FIXE - Apparaît automatiquement en bas de CHAQUE page -->
-    <div id="page-footer">
-        <span class="footer-company"><?php echo esc_html($company['name']); ?></span> — <?php echo esc_html($company['legal']); ?> — SIRET <?php echo esc_html($company['siret']); ?><br>
-        <?php echo esc_html($company['address']); ?> | <?php echo esc_html($company['email']); ?> | <?php echo esc_html($company['phone']); ?>
-        <div class="footer-page">Contrat n°<?php echo esc_html($contract_number); ?> — Page <span class="page-number"></span>/<span class="page-total"></span></div>
-    </div>
 
     <!-- ===================================================================
          PAGE 1 : CONTRAT PRINCIPAL
@@ -974,7 +857,7 @@ function cw_generate_contract_html($order_id, $contract_number) {
     </div>
 
     <!-- ARTICLE 1 : LES PARTIES -->
-    <div class="article">
+    <div class="article keep-together">
         <div class="article-title">Article 1 — Identification des Parties</div>
         <div class="article-content">
             <p>Le présent contrat est conclu entre :</p>
@@ -1012,7 +895,7 @@ function cw_generate_contract_html($order_id, $contract_number) {
     </div>
 
     <!-- ARTICLE 2 : OBJET DU CONTRAT -->
-    <div class="article">
+    <div class="article keep-together">
         <div class="article-title">Article 2 — Objet du Contrat</div>
         <div class="article-content">
             <p>Le présent contrat définit les conditions de mise à disposition d'un espace de travail équipé dénommé <strong>« <?php echo esc_html($reservation_data['offre_name']); ?> »</strong>, situé au :</p>
@@ -1029,7 +912,7 @@ function cw_generate_contract_html($order_id, $contract_number) {
     </div>
 
     <!-- ARTICLE 3 : DURÉE -->
-    <div class="article">
+    <div class="article keep-together">
         <div class="article-title">Article 3 — Durée du Contrat</div>
         <div class="article-content">
             <p>Le présent contrat est conclu pour une durée déterminée :</p>
@@ -1045,7 +928,7 @@ function cw_generate_contract_html($order_id, $contract_number) {
                 </tr>
                 <tr>
                     <th>Durée totale</th>
-                    <td><strong><?php echo $reservation_data['quantity']; ?> <?php echo esc_html($formule_label); ?><?php echo $reservation_data['quantity'] > 1 ? 's' : ''; ?></strong> (soit <?php echo $total_days; ?> jour<?php echo $total_days > 1 ? 's' : ''; ?>)</td>
+                    <td><strong><?php echo $reservation_data['quantity']; ?> <?php echo esc_html($formule_display); ?></strong> (soit <?php echo $total_days; ?> jour<?php echo $total_days > 1 ? 's' : ''; ?>)</td>
                 </tr>
             </table>
 
@@ -1054,7 +937,7 @@ function cw_generate_contract_html($order_id, $contract_number) {
     </div>
 
     <!-- ARTICLE 4 : CONDITIONS FINANCIÈRES -->
-    <div class="article">
+    <div class="article keep-together">
         <div class="article-title">Article 4 — Conditions Financières</div>
         <div class="article-content">
             <p>En contrepartie des prestations décrites, le Client s'acquitte de la redevance suivante :</p>
@@ -1062,15 +945,15 @@ function cw_generate_contract_html($order_id, $contract_number) {
             <table class="data-table">
                 <tr>
                     <th>Formule</th>
-                    <td><?php echo esc_html($formule_label); ?></td>
+                    <td><?php echo esc_html($formule_display); ?></td>
                 </tr>
                 <tr>
                     <th>Tarif unitaire</th>
-                    <td><?php echo number_format($reservation_data['unit_price'], 2, ',', ' '); ?> € TTC / <?php echo esc_html($formule_label); ?></td>
+                    <td><?php echo number_format($reservation_data['unit_price'], 2, ',', ' '); ?> € TTC / <?php echo esc_html($formule_label['singular']); ?></td>
                 </tr>
                 <tr>
                     <th>Quantité</th>
-                    <td><?php echo $reservation_data['quantity']; ?> <?php echo esc_html($formule_label); ?><?php echo $reservation_data['quantity'] > 1 ? 's' : ''; ?></td>
+                    <td><?php echo $reservation_data['quantity']; ?> <?php echo esc_html($formule_display); ?></td>
                 </tr>
                 <tr class="highlight-row">
                     <th>Montant Total TTC</th>
@@ -1085,7 +968,7 @@ function cw_generate_contract_html($order_id, $contract_number) {
     </div>
 
     <!-- ARTICLE 5 : NATURE JURIDIQUE -->
-    <div class="article">
+    <div class="article keep-together">
         <div class="article-title">Article 5 — Nature Juridique du Contrat</div>
         <div class="article-content">
             <div class="legal-notice">
@@ -1100,7 +983,7 @@ function cw_generate_contract_html($order_id, $contract_number) {
     </div>
 
     <!-- COORDONNÉES D'URGENCE -->
-    <div class="emergency-box">
+    <div class="emergency-box keep-together">
         <div class="emergency-title">Coordonnées d'urgence — Assistance 7j/7</div>
         <div class="emergency-content">
             <div class="emergency-item">
@@ -1217,13 +1100,12 @@ function cw_generate_contract_html($order_id, $contract_number) {
         <p>Le présent contrat est soumis au droit français. En cas de différend, les Parties rechercheront une solution amiable. À défaut d'accord sous 30 jours, le litige sera soumis aux tribunaux compétents du ressort du siège social du Prestataire.</p>
     </div>
 
-    <!-- Footer géré automatiquement par #page-footer -->
-
 </body>
 </html>
     <?php
     return ob_get_clean();
 }
+
 /**
  * =============================================================================
  * CONFIGURATION ADDITIONNELLE - À AJOUTER DANS VOTRE PAGE ADMIN
@@ -1264,116 +1146,6 @@ add_action('admin_init', function() {
     );
 });
 
-/**
- * =============================================================================
- * ENDPOINT DE VÉRIFICATION DU QR CODE
- * =============================================================================
- * 
- * Cette action gère la vérification du contrat quand quelqu'un scanne le QR code
- */
-add_action('wp_ajax_cw_verify_contract', 'cw_verify_contract_ajax');
-add_action('wp_ajax_nopriv_cw_verify_contract', 'cw_verify_contract_ajax');
-
-function cw_verify_contract_ajax() {
-    $contract_number = sanitize_text_field($_GET['contract'] ?? '');
-    $order_id = intval($_GET['order'] ?? 0);
-
-    if (empty($contract_number) || !$order_id) {
-        wp_die('Paramètres invalides');
-    }
-
-    $order = wc_get_order($order_id);
-    $stored_contract = get_post_meta($order_id, '_cw_contract_number', true);
-
-    if (!$order || $stored_contract !== $contract_number) {
-        ?>
-        <!DOCTYPE html>
-        <html lang="fr">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Vérification du contrat</title>
-            <style>
-                body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #fef2f2; margin: 0; }
-                .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; max-width: 400px; }
-                .icon { font-size: 60px; margin-bottom: 20px; }
-                h1 { color: #dc2626; margin: 0 0 10px 0; }
-                p { color: #6b7280; margin: 0; }
-            </style>
-        </head>
-        <body>
-            <div class="card">
-                <div class="icon">❌</div>
-                <h1>Contrat non vérifié</h1>
-                <p>Ce contrat n'a pas pu être authentifié.<br>Veuillez contacter le prestataire.</p>
-            </div>
-        </body>
-        </html>
-        <?php
-        exit;
-    }
-
-    // Contrat valide
-    $company = cw_get_company_info();
-    $client_name = $order->get_formatted_billing_full_name();
-    $contract_date = get_post_meta($order_id, '_cw_contract_date', true);
-    
-    ?>
-    <!DOCTYPE html>
-    <html lang="fr">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Contrat vérifié - <?php echo esc_html($contract_number); ?></title>
-        <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f0fdf4; margin: 0; padding: 20px; box-sizing: border-box; }
-            .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 100%; }
-            .icon { font-size: 60px; margin-bottom: 20px; }
-            h1 { color: #16a34a; margin: 0 0 20px 0; font-size: 24px; }
-            .info { text-align: left; background: #f8fafc; border-radius: 8px; padding: 20px; margin-top: 20px; }
-            .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e2e8f0; }
-            .info-row:last-child { border-bottom: none; }
-            .info-label { color: #64748b; font-size: 14px; }
-            .info-value { color: #1e293b; font-weight: 600; font-size: 14px; }
-            .footer { margin-top: 20px; font-size: 12px; color: #94a3b8; }
-        </style>
-    </head>
-    <body>
-        <div class="card">
-            <div class="icon">✅</div>
-            <h1>Contrat Authentifié</h1>
-            <p style="color: #6b7280; margin: 0;">Ce contrat est valide et émis par</p>
-            <p style="color: #1e293b; font-weight: 600; font-size: 18px; margin: 5px 0 0 0;"><?php echo esc_html($company['name']); ?></p>
-            
-            <div class="info">
-                <div class="info-row">
-                    <span class="info-label">N° Contrat</span>
-                    <span class="info-value"><?php echo esc_html($contract_number); ?></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Client</span>
-                    <span class="info-value"><?php echo esc_html($client_name); ?></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Date d'émission</span>
-                    <span class="info-value"><?php echo esc_html($contract_date ? date_i18n('d/m/Y', strtotime($contract_date)) : 'N/A'); ?></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Statut commande</span>
-                    <span class="info-value"><?php echo esc_html(wc_get_order_status_name($order->get_status())); ?></span>
-                </div>
-            </div>
-            
-            <div class="footer">
-                Vérifié le <?php echo date_i18n('d/m/Y à H:i'); ?>
-            </div>
-        </div>
-    </body>
-    </html>
-    <?php
-    exit;
-}										
-										
 /**
  * Récupère les services inclus pour une offre
  */
@@ -1428,13 +1200,13 @@ function cw_generate_contract_pdf($order_id, $existing_number = null) {
     // Utiliser le numéro existant ou en générer un nouveau
     $contract_number = $existing_number ?: cw_generate_contract_number();
 
-    // Generer le HTML
+    // Générer le HTML
     $html = cw_generate_contract_html($order_id, $contract_number);
     if (empty($html)) {
-        return ['success' => false, 'message' => 'Donnees de reservation introuvables'];
+        return ['success' => false, 'message' => 'Données de réservation introuvables'];
     }
 
-    // Creer le repertoire si necessaire
+    // Créer le répertoire si nécessaire
     $year_month = date('Y/m');
     $dir = CW_CONTRACT_DIR . $year_month . '/';
     if (!file_exists($dir)) {
@@ -1447,7 +1219,7 @@ function cw_generate_contract_pdf($order_id, $existing_number = null) {
 
     $pdf_generated = false;
 
-    // Methode 1: DOMPDF via WooCommerce PDF Invoices & Packing Slips
+    // Méthode 1: DOMPDF via WooCommerce PDF Invoices & Packing Slips
     if (!$pdf_generated) {
         $wcpdf_path = WP_PLUGIN_DIR . '/woocommerce-pdf-invoices-packing-slips/vendor/autoload.php';
         if (file_exists($wcpdf_path)) {
@@ -1458,19 +1230,23 @@ function cw_generate_contract_pdf($order_id, $existing_number = null) {
                     $options = new \Dompdf\Options();
                     $options->set('isRemoteEnabled', true);
                     $options->set('isHtml5ParserEnabled', true);
-                    $options->set('defaultFont', 'sans-serif');
+                    $options->set('defaultFont', 'DejaVu Sans');
                     $options->set('isFontSubsettingEnabled', true);
                     $options->set('defaultMediaType', 'print');
+                    $options->set('isPhpEnabled', false);
+                    $options->set('debugCss', false);
+                    $options->set('debugLayout', false);
 
                     $dompdf = new \Dompdf\Dompdf($options);
                     $dompdf->loadHtml($html);
                     $dompdf->setPaper('A4', 'portrait');
+                    $dompdf->set_option('enable_css_float', true);
                     $dompdf->render();
 
                     file_put_contents($filepath, $dompdf->output());
                     $pdf_generated = true;
 
-                    error_log('CW Contract: PDF genere avec succes - ' . $contract_number);
+                    error_log('CW Contract: PDF généré avec succès - ' . $contract_number);
                 }
             } catch (Exception $e) {
                 error_log('CW Contract PDF Error: ' . $e->getMessage());
@@ -1478,12 +1254,13 @@ function cw_generate_contract_pdf($order_id, $existing_number = null) {
         }
     }
 
-    // Methode 2: Dompdf deja charge
+    // Méthode 2: Dompdf déjà chargé
     if (!$pdf_generated && class_exists('Dompdf\Dompdf')) {
         try {
             $options = new \Dompdf\Options();
             $options->set('isRemoteEnabled', true);
             $options->set('isHtml5ParserEnabled', true);
+            $options->set('defaultFont', 'DejaVu Sans');
 
             $dompdf = new \Dompdf\Dompdf($options);
             $dompdf->loadHtml($html);
@@ -1519,13 +1296,13 @@ function cw_generate_contract_pdf($order_id, $existing_number = null) {
 
         file_put_contents($filepath, $html);
 
-        error_log('CW Contract: Fallback HTML genere - ' . $contract_number);
+        error_log('CW Contract: Fallback HTML généré - ' . $contract_number);
     }
 
-    // Hash pour verification
+    // Hash pour vérification
     $file_hash = hash_file('sha256', $filepath);
 
-    // Stocker les metadonnees
+    // Stocker les métadonnées
     update_post_meta($order_id, '_cw_contract_number', $contract_number);
     update_post_meta($order_id, '_cw_contract_file', $relative_path);
     update_post_meta($order_id, '_cw_contract_hash', $file_hash);
@@ -1548,24 +1325,24 @@ function cw_generate_contract_pdf($order_id, $existing_number = null) {
 add_action('woocommerce_order_status_completed', 'cw_maybe_generate_contract_on_complete', 20);
 
 function cw_maybe_generate_contract_on_complete($order_id) {
-    // Verifier si c'est une commande coworking necessitant un contrat
+    // Vérifier si c'est une commande coworking nécessitant un contrat
     if (!cw_should_generate_contract($order_id)) {
         return;
     }
 
-    // Verifier si le contrat existe deja
+    // Vérifier si le contrat existe déjà
     if (get_post_meta($order_id, '_cw_contract_number', true)) {
         return;
     }
 
-    // Generer le contrat
+    // Générer le contrat
     $result = cw_generate_contract_pdf($order_id);
 
     if ($result['success']) {
         $order = wc_get_order($order_id);
         if ($order) {
             // Note avec alerte si fallback HTML (PDF non disponible)
-            $note = sprintf('Contrat genere automatiquement : %s (%s)', $result['number'], strtoupper($result['format']));
+            $note = sprintf('Contrat généré automatiquement : %s (%s)', $result['number'], strtoupper($result['format']));
 
             if ($result['format'] === 'html') {
                 $note .= ' - ATTENTION: Plugin PDF non disponible, contrat en HTML uniquement';
@@ -1584,7 +1361,7 @@ function cw_maybe_generate_contract_on_complete($order_id) {
         // Ajouter une note visible sur la commande
         $order = wc_get_order($order_id);
         if ($order) {
-            $order->add_order_note('ERREUR: Echec generation contrat - ' . ($result['message'] ?? 'erreur inconnue'));
+            $order->add_order_note('ERREUR: Échec génération contrat - ' . ($result['message'] ?? 'erreur inconnue'));
         }
     }
 }
@@ -1609,7 +1386,7 @@ function cw_send_contract_email($order_id) {
     $client_name = $order->get_billing_first_name();
     $company = cw_get_company_info();
 
-    // Donnees de reservation
+    // Données de réservation
     $reservation_data = [];
     foreach ($order->get_items() as $item) {
         $offre_id = intval($item->get_meta('_cw_offre_id'));
@@ -1626,7 +1403,7 @@ function cw_send_contract_email($order_id) {
 
     if (empty($reservation_data)) return false;
 
-    // Lien securise
+    // Lien sécurisé
     $secure_link = cw_generate_contract_secure_link($order_id);
 
     // Email
@@ -1635,24 +1412,24 @@ function cw_send_contract_email($order_id) {
     $message = sprintf(
 'Bonjour %s,
 
-Votre reservation est confirmee !
+Votre réservation est confirmée !
 
 Vous trouverez ci-joint votre contrat de prestation de services.
 
-VOTRE RESERVATION
+VOTRE RÉSERVATION
 -----------------
 Espace : %s
 Du : %s
 Au : %s
-Montant : %s EUR (paye)
+Montant : %s EUR (payé)
 
-Acceder au contrat en ligne : %s
+Accéder au contrat en ligne : %s
 
-Ce contrat recapitule les conditions de votre reservation. En procedant au paiement, vous avez accepte ces conditions ainsi que nos CGV et reglement interieur.
+Ce contrat récapitule les conditions de votre réservation. En procédant au paiement, vous avez accepté ces conditions ainsi que nos CGV et règlement intérieur.
 
-Des questions ? Repondez a cet email.
+Des questions ? Répondez à cet email.
 
-A bientot !
+À bientôt !
 
 --
 %s
@@ -1682,17 +1459,17 @@ A bientot !
     if ($sent) {
         update_post_meta($order_id, '_cw_contract_sent', current_time('mysql'));
         update_post_meta($order_id, '_cw_contract_email_status', 'sent');
-        $order->add_order_note(sprintf('Contrat envoye par email a %s', $client_email));
+        $order->add_order_note(sprintf('Contrat envoyé par email à %s', $client_email));
     } else {
         update_post_meta($order_id, '_cw_contract_email_status', 'failed');
-        $order->add_order_note(sprintf('Echec envoi contrat a %s', $client_email));
+        $order->add_order_note(sprintf('Échec envoi contrat à %s', $client_email));
     }
 
     return $sent;
 }
 
 /* =============================================================================
-   ACCES SECURISE AU CONTRAT (LIEN PUBLIC)
+   ACCÈS SÉCURISÉ AU CONTRAT (LIEN PUBLIC)
 ============================================================================= */
 
 function cw_generate_contract_secure_link($order_id) {
@@ -1780,7 +1557,7 @@ function cw_handle_contract_download() {
 }
 
 /**
- * Wrap le contrat HTML dans une page elegante style PDF viewer
+ * Wrap le contrat HTML dans une page élégante style PDF viewer
  */
 function cw_wrap_html_contract($html_content, $contract_number) {
     // Extraire le contenu du body
@@ -1949,7 +1726,7 @@ function cw_wrap_html_contract($html_content, $contract_number) {
 add_action('add_meta_boxes', 'cw_add_contract_metabox');
 
 function cw_add_contract_metabox() {
-    // Compatibilite HPOS
+    // Compatibilité HPOS
     $screen = class_exists('\Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController')
         && wc_get_container()->get(\Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController::class)->custom_orders_table_usage_is_enabled()
         ? wc_get_page_screen_id('shop-order')
@@ -1971,7 +1748,7 @@ function cw_render_contract_metabox($post_or_order) {
 
     $order_id = $order->get_id();
 
-    // Verifier si c'est une commande coworking
+    // Vérifier si c'est une commande coworking
     $is_coworking = false;
     foreach ($order->get_items() as $item) {
         if ($item->get_meta('_cw_offre_id')) {
@@ -2235,7 +2012,7 @@ function cw_ajax_resend_contract() {
     exit;
 }
 
-// Regenerer un contrat (supprimer l'ancien et en creer un nouveau)
+// Regénérer un contrat (supprimer l'ancien et en créer un nouveau)
 add_action('wp_ajax_cw_regenerate_contract', 'cw_ajax_regenerate_contract');
 
 function cw_ajax_regenerate_contract() {
@@ -2255,7 +2032,7 @@ function cw_ajax_regenerate_contract() {
         wp_die('Commande introuvable', 'Erreur', ['response' => 404]);
     }
 
-    // Recuperer l'ancien numero de contrat pour le conserver
+    // Récupérer l'ancien numéro de contrat pour le conserver
     $old_contract_number = get_post_meta($order_id, '_cw_contract_number', true);
     $old_contract_file = get_post_meta($order_id, '_cw_contract_file', true);
 
@@ -2274,9 +2051,9 @@ function cw_ajax_regenerate_contract() {
     delete_post_meta($order_id, '_cw_contract_format');
     delete_post_meta($order_id, '_cw_contract_sent');
     delete_post_meta($order_id, '_cw_contract_email_status');
-    // On garde _cw_contract_number et _cw_contract_access_token pour conserver le meme numero
+    // On garde _cw_contract_number et _cw_contract_access_token pour conserver le même numéro
 
-    // Regenerer le contrat avec le meme numero
+    // Régénérer le contrat avec le même numéro
     $result = cw_generate_contract_pdf($order_id, $old_contract_number);
 
     if ($result['success']) {
@@ -2298,7 +2075,7 @@ function cw_ajax_regenerate_contract() {
 }
 
 /**
- * Helper: Obtenir l'URL d'edition d'une commande (compatible HPOS)
+ * Helper: Obtenir l'URL d'édition d'une commande (compatible HPOS)
  */
 function cw_get_order_edit_url($order_id) {
     if (class_exists('\Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController') &&
@@ -2350,7 +2127,7 @@ function cw_add_contract_settings_page() {
 }
 
 function cw_render_contract_settings_page() {
-    // Sauvegarder les parametres
+    // Sauvegarder les paramètres
     if (isset($_POST['cw_save_settings']) && check_admin_referer('cw_contract_settings')) {
         update_option('cw_company_name', sanitize_text_field($_POST['cw_company_name']));
         update_option('cw_company_legal', sanitize_text_field($_POST['cw_company_legal']));
@@ -2362,14 +2139,14 @@ function cw_render_contract_settings_page() {
         update_option('cw_company_website', esc_url_raw($_POST['cw_company_website']));
         update_option('cw_company_rcs', sanitize_text_field($_POST['cw_company_rcs']));
 
-        echo '<div class="notice notice-success"><p>Parametres enregistres !</p></div>';
+        echo '<div class="notice notice-success"><p>Paramètres enregistrés !</p></div>';
     }
 
     $company = cw_get_company_info();
     ?>
     <div class="wrap">
         <h1>Configuration des contrats</h1>
-        <p>Ces informations apparaitront sur tous les contrats generes pour vos reservations.</p>
+        <p>Ces informations apparaîtront sur tous les contrats générés pour vos réservations.</p>
 
         <form method="post" action="">
             <?php wp_nonce_field('cw_contract_settings'); ?>
@@ -2387,11 +2164,11 @@ function cw_render_contract_settings_page() {
                     </td>
                 </tr>
                 <tr>
-                    <th><label for="cw_company_address">Adresse complete *</label></th>
+                    <th><label for="cw_company_address">Adresse complète *</label></th>
                     <td><input type="text" id="cw_company_address" name="cw_company_address" value="<?php echo esc_attr($company['address']); ?>" class="large-text" required></td>
                 </tr>
                 <tr>
-                    <th><label for="cw_company_siret">Numero SIRET *</label></th>
+                    <th><label for="cw_company_siret">Numéro SIRET *</label></th>
                     <td><input type="text" id="cw_company_siret" name="cw_company_siret" value="<?php echo esc_attr($company['siret']); ?>" class="regular-text" placeholder="123 456 789 00012" required></td>
                 </tr>
                 <tr>
@@ -2399,7 +2176,7 @@ function cw_render_contract_settings_page() {
                     <td><input type="text" id="cw_company_rcs" name="cw_company_rcs" value="<?php echo esc_attr($company['rcs']); ?>" class="regular-text" placeholder="RCS Paris"></td>
                 </tr>
                 <tr>
-                    <th><label for="cw_company_tva">N TVA intracommunautaire</label></th>
+                    <th><label for="cw_company_tva">N° TVA intracommunautaire</label></th>
                     <td><input type="text" id="cw_company_tva" name="cw_company_tva" value="<?php echo esc_attr($company['tva']); ?>" class="regular-text" placeholder="FR12 123456789"></td>
                 </tr>
                 <tr>
@@ -2407,7 +2184,7 @@ function cw_render_contract_settings_page() {
                     <td><input type="email" id="cw_company_email" name="cw_company_email" value="<?php echo esc_attr($company['email']); ?>" class="regular-text" required></td>
                 </tr>
                 <tr>
-                    <th><label for="cw_company_phone">Telephone</label></th>
+                    <th><label for="cw_company_phone">Téléphone</label></th>
                     <td><input type="text" id="cw_company_phone" name="cw_company_phone" value="<?php echo esc_attr($company['phone']); ?>" class="regular-text" placeholder="01 23 45 67 89"></td>
                 </tr>
                 <tr>
@@ -2423,14 +2200,14 @@ function cw_render_contract_settings_page() {
 
         <hr>
 
-        <h2>Regles de generation automatique</h2>
-        <p>Un contrat est genere automatiquement lorsqu'une commande passe en statut "Terminee" ET remplit l'une de ces conditions :</p>
+        <h2>Règles de génération automatique</h2>
+        <p>Un contrat est généré automatiquement lorsqu'une commande passe en statut "Terminée" ET remplit l'une de ces conditions :</p>
         <ul style="list-style:disc; margin-left:25px;">
             <li>Formule = <strong>Semaine</strong> ou <strong>Mois</strong></li>
-            <li>Duree totale >= <strong><?php echo CW_CONTRACT_MIN_DAYS; ?> jours</strong></li>
+            <li>Durée totale >= <strong><?php echo CW_CONTRACT_MIN_DAYS; ?> jours</strong></li>
             <li>Montant >= <strong><?php echo CW_CONTRACT_MIN_AMOUNT; ?> EUR</strong></li>
         </ul>
-        <p><em>Pour modifier ces seuils, editez les constantes au debut du snippet.</em></p>
+        <p><em>Pour modifier ces seuils, éditez les constantes au début du snippet.</em></p>
 
         <hr>
 
@@ -2442,11 +2219,11 @@ function cw_render_contract_settings_page() {
         ?>
         <table class="widefat" style="max-width:400px;">
             <tr>
-                <td>Contrats generes en <?php echo $year; ?></td>
+                <td>Contrats générés en <?php echo $year; ?></td>
                 <td><strong><?php echo $counter; ?></strong></td>
             </tr>
             <tr>
-                <td>Contrats generes en <?php echo $year - 1; ?></td>
+                <td>Contrats générés en <?php echo $year - 1; ?></td>
                 <td><strong><?php echo $prev_year; ?></strong></td>
             </tr>
         </table>
@@ -2461,5 +2238,335 @@ function cw_render_contract_settings_page() {
 }
 
 /* =============================================================================
-   FIN DU SYSTEME DE CONTRATS COWORKING v2.0
+   PAGE DE VÉRIFICATION PUBLIQUE
+============================================================================= */
+
+/**
+ * Crée la page de vérification des contrats
+ */
+function cw_create_verification_page() {
+    // Créer la page si elle n'existe pas
+    $page_title = 'Vérifier un contrat';
+    $page_slug = 'verifier-contrat';
+    
+    $existing_page = get_page_by_path($page_slug);
+    
+    if (!$existing_page) {
+        $page_data = array(
+            'post_title'    => $page_title,
+            'post_name'     => $page_slug,
+            'post_content'  => '<!-- Contenu généré par le système de contrats -->',
+            'post_status'   => 'publish',
+            'post_type'     => 'page',
+            'post_author'   => 1,
+        );
+        
+        $page_id = wp_insert_post($page_data);
+        
+        if ($page_id) {
+            update_post_meta($page_id, '_cw_verification_page', true);
+        }
+    }
+}
+
+add_action('init', 'cw_create_verification_page');
+
+/**
+ * Gère la vérification publique des contrats
+ */
+function cw_handle_public_verification() {
+    global $wp_query;
+    
+    if (isset($wp_query->query_vars['verification_id'])) {
+        $verification_id = sanitize_text_field($wp_query->query_vars['verification_id']);
+        $order_id = false;
+        $contract_number = '';
+        
+        // Chercher la commande avec ce hash
+        $orders = wc_get_orders([
+            'limit' => 1,
+            'meta_key' => '_cw_verification_id',
+            'meta_value' => $verification_id,
+        ]);
+        
+        if (!empty($orders)) {
+            $order = reset($orders);
+            $order_id = $order->get_id();
+            $contract_number = get_post_meta($order_id, '_cw_contract_number', true);
+            $client_name = $order->get_formatted_billing_full_name();
+            $company = cw_get_company_info();
+            $contract_date = get_post_meta($order_id, '_cw_contract_generated', true);
+        }
+        
+        // Afficher la page de vérification
+        ?>
+        <!DOCTYPE html>
+        <html lang="fr">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Vérification du contrat</title>
+            <style>
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+                
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    min-height: 100vh;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    padding: 20px;
+                }
+                
+                .verification-card {
+                    background: white;
+                    border-radius: 16px;
+                    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                    max-width: 500px;
+                    width: 100%;
+                    overflow: hidden;
+                }
+                
+                .card-header {
+                    background: linear-gradient(135deg, #1e73be 0%, #155a96 100%);
+                    color: white;
+                    padding: 30px;
+                    text-align: center;
+                }
+                
+                .card-header h1 {
+                    font-size: 24px;
+                    font-weight: 600;
+                    margin-bottom: 10px;
+                }
+                
+                .card-header p {
+                    opacity: 0.9;
+                    font-size: 14px;
+                }
+                
+                .card-body {
+                    padding: 40px 30px;
+                }
+                
+                .status-badge {
+                    display: inline-block;
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    margin-bottom: 30px;
+                }
+                
+                .status-valid {
+                    background: #d1fae5;
+                    color: #065f46;
+                }
+                
+                .status-invalid {
+                    background: #fee2e2;
+                    color: #991b1b;
+                }
+                
+                .contract-info {
+                    background: #f8fafc;
+                    border-radius: 12px;
+                    padding: 24px;
+                    margin-bottom: 30px;
+                }
+                
+                .info-row {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 12px 0;
+                    border-bottom: 1px solid #e2e8f0;
+                }
+                
+                .info-row:last-child {
+                    border-bottom: none;
+                }
+                
+                .info-label {
+                    color: #64748b;
+                    font-size: 14px;
+                }
+                
+                .info-value {
+                    color: #1e293b;
+                    font-weight: 600;
+                    font-size: 14px;
+                    text-align: right;
+                }
+                
+                .company-footer {
+                    text-align: center;
+                    padding-top: 20px;
+                    border-top: 1px solid #e2e8f0;
+                }
+                
+                .company-name {
+                    color: #1e73be;
+                    font-weight: 600;
+                    font-size: 16px;
+                    margin-bottom: 5px;
+                }
+                
+                .verification-date {
+                    color: #94a3b8;
+                    font-size: 12px;
+                    margin-top: 20px;
+                }
+                
+                .verification-icon {
+                    font-size: 64px;
+                    margin-bottom: 20px;
+                }
+                
+                .btn-download {
+                    display: inline-block;
+                    background: #1e73be;
+                    color: white;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    text-decoration: none;
+                    font-weight: 600;
+                    font-size: 14px;
+                    transition: background 0.2s;
+                    margin-top: 20px;
+                }
+                
+                .btn-download:hover {
+                    background: #155a96;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="verification-card">
+                <div class="card-header">
+                    <div class="verification-icon">
+                        <?php if ($order_id): ?>
+                            ✅
+                        <?php else: ?>
+                            ❌
+                        <?php endif; ?>
+                    </div>
+                    <h1>
+                        <?php if ($order_id): ?>
+                            Contrat Authentifié
+                        <?php else: ?>
+                            Contrat Non Trouvé
+                        <?php endif; ?>
+                    </h1>
+                    <p>
+                        <?php if ($order_id): ?>
+                            Ce contrat a été émis par
+                        <?php else: ?>
+                            Le lien de vérification est invalide
+                        <?php endif; ?>
+                    </p>
+                </div>
+                
+                <div class="card-body">
+                    <?php if ($order_id): ?>
+                        <div class="status-badge status-valid">✓ Valide</div>
+                        
+                        <div class="contract-info">
+                            <div class="info-row">
+                                <span class="info-label">N° Contrat</span>
+                                <span class="info-value"><?php echo esc_html($contract_number); ?></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Client</span>
+                                <span class="info-value"><?php echo esc_html($client_name); ?></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Date d'émission</span>
+                                <span class="info-value"><?php echo $contract_date ? date_i18n('d/m/Y', strtotime($contract_date)) : 'N/A'; ?></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Statut</span>
+                                <span class="info-value" style="color: #10b981;">✓ Actif</span>
+                            </div>
+                        </div>
+                        
+                        <div class="company-footer">
+                            <div class="company-name"><?php echo esc_html($company['name']); ?></div>
+                            <p style="color: #64748b; font-size: 14px; margin-top: 5px;"><?php echo esc_html($company['address']); ?></p>
+                            
+                            <?php 
+                            $secure_link = cw_generate_contract_secure_link($order_id);
+                            if ($secure_link): ?>
+                                <a href="<?php echo esc_url($secure_link); ?>" class="btn-download" target="_blank">
+                                    📄 Télécharger le contrat
+                                </a>
+                            <?php endif; ?>
+                        </div>
+                        
+                        <div class="verification-date">
+                            Vérifié le <?php echo date_i18n('d/m/Y à H:i'); ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="status-badge status-invalid">✗ Invalide</div>
+                        
+                        <div class="contract-info">
+                            <p style="color: #64748b; text-align: center; padding: 20px;">
+                                Ce contrat n'a pas pu être authentifié.<br>
+                                Le lien peut être expiré ou le contrat peut avoir été supprimé.
+                            </p>
+                        </div>
+                        
+                        <div class="company-footer">
+                            <p style="color: #64748b; font-size: 14px;">
+                                Pour plus d'informations, contactez directement l'entreprise.
+                            </p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </body>
+        </html>
+        <?php
+        exit;
+    }
+}
+
+add_action('template_redirect', 'cw_handle_public_verification', 5);
+
+/**
+ * Ajoute la réécriture d'URL pour la vérification
+ */
+function cw_add_verification_rewrite() {
+    add_rewrite_rule(
+        '^verifier-contrat/([a-zA-Z0-9]+)/?$',
+        'index.php?verification_id=$matches[1]',
+        'top'
+    );
+    
+    add_rewrite_tag('%verification_id%', '([a-zA-Z0-9]+)');
+}
+
+add_action('init', 'cw_add_verification_rewrite');
+
+/* =============================================================================
+   FLUSH REWRITE RULES À L'ACTIVATION
+============================================================================= */
+
+register_activation_hook(__FILE__, function() {
+    cw_add_verification_rewrite();
+    flush_rewrite_rules();
+});
+
+register_deactivation_hook(__FILE__, function() {
+    flush_rewrite_rules();
+});
+
+/* =============================================================================
+   FIN DU SYSTÈME DE CONTRATS COWORKING v2.1
 ============================================================================= */
