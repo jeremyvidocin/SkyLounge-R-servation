@@ -2873,6 +2873,36 @@ body.intro-playing .nav-dots {
     color: var(--skylounge-success);
 }
 
+/* Design Process (Lovable mention) */
+.design-process {
+    margin-top: var(--space-lg);
+    padding: var(--space-md);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    border: 1px solid var(--accent-primary);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.process-badge {
+    background: var(--accent-primary);
+    color: white;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.process-text {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.process-text strong {
+    color: var(--accent-primary);
+}
+
 /* Learning Badge */
 .cpt-learning {
     display: flex;
