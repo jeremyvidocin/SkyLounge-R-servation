@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyLounge Coworking - Revue Technique</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+        <div class="progress-text" id="progressText">1 / 12</div>
+    </div>
+
+    <!-- Navigation Dots -->
+    <nav class="nav-dots" id="navDots"></nav>
+
+    <!-- Slides Container -->
+    <div class="slides-container" id="slidesContainer">
+
+        <!-- ================================================================
+             SLIDE 1: TITRE
+             ================================================================ -->
+        <section class="slide slide-title active" data-slide="1">
+            <div class="slide-content">
+                <div class="title-badge animate-in">
+                    <span class="badge-icon">📋</span>
+                    <span>Revue Technique - Alternance L3 MIAGE</span>
+                </div>
+                <h1 class="main-title animate-in delay-1">
+                    <span class="title-line">SkyLounge</span>
+                    <span class="title-line gradient-text">Réservation</span>
+                </h1>
+                <p class="subtitle animate-in delay-2">Système de booking coworking sur WordPress</p>
+                <div class="title-meta animate-in delay-3">
+                    <div class="meta-item">
+                        <span class="meta-icon">👤</span>
+                        <span>Jérémy VIDOCIN</span>
+                    </div>
+                    <div class="meta-separator">•</div>
+                    <div class="meta-item">
+                        <span class="meta-icon">📅</span>
+                        <span>Décembre 2025</span>
+                    </div>
+                    <div class="meta-separator">•</div>
+                    <div class="meta-item">
+                        <span class="meta-icon">⏱️</span>
+                        <span>45 min</span>
+                    </div>
+                </div>
+                <div class="agenda-quick animate-in delay-4">
+                    <div class="agenda-item-quick">1. Jira</div>
+                    <div class="agenda-item-quick">2. Difficultés</div>
+                    <div class="agenda-item-quick">3. Application</div>
+                    <div class="agenda-item-quick">4. Code</div>
+                </div>
+            </div>
+            <div class="slide-background">
+                <div class="bg-gradient"></div>
+                <div class="bg-grid"></div>
+            </div>
+        </section>
+
+        <!-- ================================================================
+             SLIDE 2: CONTEXTE PROJET
+             ================================================================ -->
+        <section class="slide slide-context" data-slide="2">
+            <div class="slide-content">
+                <div class="section-label animate-in">Introduction</div>
+                <h2 class="slide-title animate-in delay-1">Contexte du Projet</h2>
+                <div class="context-grid animate-in delay-2">
+                    <div class="context-card">
+                        <div class="card-icon">🎯</div>
+                        <h3>Objectif</h3>
+                        <p>Système de réservation complet pour espaces de coworking avec paiement en ligne</p>
+                    </div>
+                    <div class="context-card">
+                        <div class="card-icon">⚙️</div>
+                        <h3>Stack Technique</h3>
+                        <p>WordPress + WooCommerce + ACF + Code Snippets (14 modules PHP)</p>
+                    </div>
+                    <div class="context-card">
+                        <div class="card-icon">🔒</div>
+                        <h3>Contrainte Clé</h3>
+                        <p>Budget 0€ plugins → Solution 100% custom sans Amelia/Bookly</p>
+                    </div>
+                    <div class="context-card">
+                        <div class="card-icon">📊</div>
+                        <h3>Livrables</h3>
+                        <p>~400 KB de code PHP • 3 endpoints REST • Interface admin complète</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================
+             SLIDE 3: JIRA - ORGANISATION
+             ================================================================ -->
+        <section class="slide slide-jira" data-slide="3">
+            <div class="slide-content">
+                <div class="section-label animate-in">01 - Jira</div>
+                <h2 class="slide-title animate-in delay-1">Organisation du Travail</h2>
+                <p class="slide-subtitle animate-in delay-1">→ Ouvrir Jira pour montrer les tickets en détail</p>
+                <div class="jira-overview animate-in delay-2">
+                    <div class="jira-stats">
+                        <div class="jira-stat">
+                            <span class="stat-number">XX</span>
+                            <span class="stat-label">Tickets créés</span>
+                        </div>
+                        <div class="jira-stat">
+                            <span class="stat-number">XX</span>
+                            <span class="stat-label">Tickets terminés</span>
+                        </div>
+                        <div class="jira-stat">
+                            <span class="stat-number">XX</span>
+                            <span class="stat-label">Sprints</span>
+                        </div>
+                    </div>
+                    <div class="jira-epics">
+                        <h3>Epics / Grandes fonctionnalités</h3>
+                        <div class="epic-list">
+                            <div class="epic-item">
+                                <span class="epic-status done">✓</span>
+                                <span class="epic-name">Calendrier de réservation frontend</span>
+                            </div>
+                            <div class="epic-item">
+                                <span class="epic-status done">✓</span>
+                                <span class="epic-name">Système anti-double booking (locks)</span>
+                            </div>
+                            <div class="epic-item">
+                                <span class="epic-status done">✓</span>
+                                <span class="epic-name">Intégration WooCommerce (paiement)</span>
+                            </div>
+                            <div class="epic-item">
+                                <span class="epic-status done">✓</span>
+                                <span class="epic-name">Interface admin (dashboard, colonnes)</span>
+                            </div>
+                            <div class="epic-item">
+                                <span class="epic-status done">✓</span>
+                                <span class="epic-name">Génération contrats PDF</span>
+                            </div>
+                            <div class="epic-item">
+                                <span class="epic-status done">✓</span>
+                                <span class="epic-name">Conformité RGPD</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="jira-note animate-in delay-3">
+                    <span class="note-icon">💡</span>
+                    <span>À compléter avec vos vraies données Jira lors de la présentation</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================
+             SLIDE 4: JIRA - EXEMPLE TICKET
+             ================================================================ -->
+        <section class="slide slide-jira-ticket" data-slide="4">
+            <div class="slide-content">
+                <div class="section-label animate-in">01 - Jira</div>
+                <h2 class="slide-title animate-in delay-1">Exemple de Ticket</h2>
+                <p class="slide-subtitle animate-in delay-1">→ Montrer un ticket réel dans Jira</p>
+                <div class="ticket-example animate-in delay-2">
+                    <div class="ticket-header">
+                        <span class="ticket-type bug">🐛 Bug</span>
+                        <span class="ticket-id">SKYLOUNGE-XX</span>
+                    </div>
+                    <h3 class="ticket-title">Double réservation possible sur le même créneau</h3>
+                    <div class="ticket-details">
+                        <div class="ticket-field">
+                            <strong>Description :</strong>
+                            <p>Deux utilisateurs peuvent réserver le même créneau s'ils cliquent en même temps.</p>
+                        </div>
+                        <div class="ticket-field">
+                            <strong>Ma démarche :</strong>
+                            <ol>
+                                <li>Analyse du problème (race condition)</li>
+                                <li>Recherche de solutions (pessimistic locking, optimistic locking, mutex)</li>
+                                <li>Choix technique : transients WordPress avec TTL</li>
+                                <li>Implémentation + tests</li>
+                            </ol>
+                        </div>
+                        <div class="ticket-field">
+                            <strong>Temps estimé :</strong> X heures
+                            <strong style="margin-left: 2rem;">Temps réel :</strong> X heures
+                        </div>
+                    </div>
+                </div>
+                <div class="ticket-note animate-in delay-3">
+                    Ce ticket sera détaillé dans la section "Difficultés"
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================
+             SLIDE 5: DIFFICULTÉS - VUE D'ENSEMBLE
+             ================================================================ -->
+        <section class="slide slide-difficulties" data-slide="5">
+            <div class="slide-content">
+                <div class="section-label animate-in">02 - Difficultés</div>
+                <h2 class="slide-title animate-in delay-1">Problèmes Rencontrés</h2>
+                <div class="difficulties-grid animate-in delay-2">
+                    <div class="difficulty-card critical">
+                        <div class="difficulty-severity">🔴 Critique</div>
+                        <h3>Race Condition Double Booking</h3>
+                        <p>Deux users réservent le même créneau simultanément</p>
+                        <div class="difficulty-solution">
+                            <strong>→</strong> Système de locks avec transients WordPress
+                        </div>
+                    </div>
+                    <div class="difficulty-card high">
+                        <div class="difficulty-severity">🟠 Important</div>
+                        <h3>Désynchronisation JSON/CPT</h3>
+                        <p>Le cache JSON peut diverger des vraies réservations</p>
+                        <div class="difficulty-solution">
+                            <strong>→</strong> CRON quotidien de vérification + rebuild
+                        </div>
+                    </div>
+                    <div class="difficulty-card medium">
+                        <div class="difficulty-severity">🟡 Moyen</div>
+                        <h3>Guest Checkout WooCommerce</h3>
+                        <p>Conserver les données de réservation sans compte</p>
+                        <div class="difficulty-solution">
+                            <strong>→</strong> Metadata sur order items + hooks personnalisés
+                        </div>
+                    </div>
+                    <div class="difficulty-card medium">
+                        <div class="difficulty-severity">🟡 Moyen</div>
+                        <h3>Génération PDF sans plugin payant</h3>
+                        <p>Créer des contrats professionnels</p>
+                        <div class="difficulty-solution">
+                            <strong>→</strong> Template HTML + fallback WPO WCPDF
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================
+             SLIDE 6: DIFFICULTÉS - DEEP DIVE LOCKS
+             ================================================================ -->
+        <section class="slide slide-locks-detail" data-slide="6">
+            <div class="slide-content">
+                <div class="section-label animate-in">02 - Difficultés</div>
+                <h2 class="slide-title animate-in delay-1">Focus : Anti-Double Booking</h2>
+                <div class="problem-solution-layout animate-in delay-2">
+                    <div class="problem-side">
+                        <h3>❌ Le Problème</h3>
+                        <div class="timeline-scenario">
+                            <div class="timeline-row">
+                                <span class="time">14:00:00</span>
+                                <span class="user-a">User A sélectionne 15 janv</span>
+                                <span class="user-b">-</span>
+                            </div>
+                            <div class="timeline-row">
+                                <span class="time">14:00:01</span>
+                                <span class="user-a">-</span>
+                                <span class="user-b">User B sélectionne 15 janv</span>
+                            </div>
+                            <div class="timeline-row">
+                                <span class="time">14:00:25</span>
+                                <span class="user-a">-</span>
+                                <span class="user-b">User B paie ✓</span>
+                            </div>
+                            <div class="timeline-row conflict">
+                                <span class="time">14:00:30</span>
+                                <span class="user-a">User A paie ✓</span>
+                                <span class="user-b">-</span>
+                            </div>
+                            <div class="timeline-result">💥 2 réservations pour 1 place !</div>
+                        </div>
+                    </div>
+                    <div class="solution-side">
+                        <h3>✅ Ma Solution</h3>
+                        <div class="solution-steps">
+                            <div class="solution-step">
+                                <span class="step-num">1</span>
+                                <span>Recherche : mutex, pessimistic/optimistic locking</span>
+                            </div>
+                            <div class="solution-step">
+                                <span class="step-num">2</span>
+                                <span>Choix : WordPress Transients (clé-valeur avec TTL)</span>
+                            </div>
+                            <div class="solution-step">
+                                <span class="step-num">3</span>
+                                <span>Implémentation : lock créé AVANT ajout panier</span>
+                            </div>
+                            <div class="solution-step">
+                                <span class="step-num">4</span>
+                                <span>TTL adaptatif : 20 min (bureau) / 5 min (salle)</span>
+                            </div>
+                        </div>
+                        <div class="code-preview">
+                            <pre><code>// TTL selon capacité
+function cw_get_lock_ttl($offre_id) {
+    $capacity = get_field('capacite_max', $offre_id);
+    return ($capacity <= 1) 
+        ? 20 * MINUTE_IN_SECONDS  // Bureau unique
+        : 5 * MINUTE_IN_SECONDS;  // Salle partagée
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================
+             SLIDE 7: APPLICATION - ARCHITECTURE
+             ================================================================ -->
+        <section class="slide slide-architecture" data-slide="7">
+            <div class="slide-content">
+                <div class="section-label animate-in">03 - Application</div>
+                <h2 class="slide-title animate-in delay-1">Architecture Globale</h2>
+                <p class="slide-subtitle animate-in delay-1">→ Démo live de l'application après cette slide</p>
+                <div class="architecture-diagram animate-in delay-2">
+                    <div class="arch-layer frontend">
+                        <div class="layer-label">FRONTEND</div>
+                        <div class="layer-content">
+                            <div class="arch-box">📅 Calendrier JS</div>
+                            <div class="arch-box">💰 Calcul Prix</div>
+                            <div class="arch-box">🛒 Checkout WC</div>
+                        </div>
+                    </div>
+                    <div class="arch-arrow">
+                        <span>REST API</span>
+                    </div>
+                    <div class="arch-layer backend">
+                        <div class="layer-label">BOOKING ENGINE (PHP)</div>
+                        <div class="layer-content">
+                            <div class="arch-box highlight">🔒 Locks (transients)</div>
+                            <div class="arch-box">📊 Disponibilités</div>
+                            <div class="arch-box">✅ Validation</div>
+                        </div>
+                    </div>
+                    <div class="arch-arrow">
+                        <span>CRUD</span>
+                    </div>
+                    <div class="arch-layer data">
+                        <div class="layer-label">DATA</div>
+                        <div class="layer-content">
+                            <div class="arch-box">📦 CPT Réservation</div>
+                            <div class="arch-box">🛍️ WC Orders</div>
+                            <div class="arch-box">⚡ JSON Cache</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================
+             SLIDE 8: APPLICATION - MODULES
+             ================================================================ -->
+        <section class="slide slide-modules" data-slide="8">
+            <div class="slide-content">
+                <div class="section-label animate-in">03 - Application</div>
+                <h2 class="slide-title animate-in delay-1">14 Modules PHP</h2>
+                <div class="modules-table animate-in delay-2">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Priorité</th>
+                                <th>Module</th>
+                                <th>Responsabilité</th>
+                                <th>Taille</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="module-core">
+                                <td>P1</td>
+                                <td><code>coworking-config</code></td>
+                                <td>Configuration centrale, constantes</td>
+                                <td>9.8 KB</td>
+                            </tr>
+                            <tr class="module-core">
+                                <td>P2</td>
+                                <td><code>booking-engine-v2</code></td>
+                                <td>Locks, cart-add, validation</td>
+                                <td>42.5 KB</td>
+                            </tr>
+                            <tr class="module-core">
+                                <td>P3</td>
+                                <td><code>systeme-disponibilite</code></td>
+                                <td>API REST disponibilités</td>
+                                <td>13.3 KB</td>
+                            </tr>
+                            <tr class="module-frontend">
+                                <td>P4</td>
+                                <td><code>calendrier-v2</code></td>
+                                <td>Frontend JS complet</td>
+                                <td>33.2 KB</td>
+                            </tr>
+                            <tr class="module-wc">
+                                <td>P5</td>
+                                <td><code>wc-order-complete</code></td>
+                                <td>Hook après paiement</td>
+                                <td>3.5 KB</td>
+                            </tr>
+                            <tr class="module-admin">
+                                <td>P6-8</td>
+                                <td><code>admin-*</code></td>
+                                <td>Colonnes, metabox, dashboard</td>
+                                <td>128.7 KB</td>
+                            </tr>
+                            <tr class="module-other">
+                                <td>P9-14</td>
+                                <td><code>cron, notif, pdf, rgpd...</code></td>
+                                <td>Features additionnelles</td>
+                                <td>~70 KB</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modules-note animate-in delay-3">
+                    Total : ~400 KB de code PHP • Architecture modulaire via Code Snippets
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================
+             SLIDE 9: CODE - BOOKING ENGINE
+             ================================================================ -->
+        <section class="slide slide-code" data-slide="9">
+            <div class="slide-content">
+                <div class="section-label animate-in">04 - Code</div>
+                <h2 class="slide-title animate-in delay-1">booking-engine-v2.php</h2>
+                <p class="slide-subtitle animate-in delay-1">→ Ouvrir le fichier dans VS Code pour détails</p>
+                <div class="code-highlights animate-in delay-2">
+                    <div class="code-section">
+                        <h3>📍 Ligne ~65 : TTL adaptatif</h3>
+                        <pre><code>function cw_get_lock_ttl($offre_id) {
+    $capacity = (int) get_field('capacite_max', $offre_id);
+    if ($capacity <= 1) {
+        return 20 * MINUTE_IN_SECONDS; // Bureau unique
+    } else {
+        return 5 * MINUTE_IN_SECONDS;  // Espace partagé
+    }
+}</code></pre>
+                        <p class="code-explain">Logique métier : un bureau privé est unique, on laisse plus de temps</p>
+                    </div>
+                    <div class="code-section">
+                        <h3>📍 Ligne ~220 : Vérification disponibilité</h3>
+                        <pre><code>function coworking_check_availability_with_locks($offre_id, $start, $end) {
+    // 1. Récupérer capacité max
+    // 2. Compter réservations confirmées (JSON)
+    // 3. Compter locks temporaires (transients)
+    // 4. Retourner available + fail_date si besoin
+}</code></pre>
+                        <p class="code-explain">Fonction CRITIQUE : vérifie réservations ET locks</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================
+             SLIDE 10: CODE - CALENDRIER
+             ================================================================ -->
+        <section class="slide slide-code" data-slide="10">
+            <div class="slide-content">
+                <div class="section-label animate-in">04 - Code</div>
+                <h2 class="slide-title animate-in delay-1">calendrier-v2.php</h2>
+                <p class="slide-subtitle animate-in delay-1">→ Ouvrir le fichier dans VS Code pour détails</p>
+                <div class="code-highlights animate-in delay-2">
+                    <div class="code-section">
+                        <h3>🎨 Architecture</h3>
+                        <ul class="code-points">
+                            <li><strong>Vanilla JS</strong> - Pas de React/Vue, 100% natif</li>
+                            <li><strong>Shortcode</strong> - [coworking_calendar] injecte tout</li>
+                            <li><strong>CSS Variables</strong> - Thème cohérent SkyLounge</li>
+                            <li><strong>REST API</strong> - Appels async vers /availability et /cart-add</li>
+                        </ul>
+                    </div>
+                    <div class="code-section">
+                        <h3>📍 Points clés à montrer</h3>
+                        <ul class="code-points">
+                            <li>Génération du calendrier mensuel (grid CSS)</li>
+                            <li>Calcul dynamique des prix selon formule</li>
+                            <li>Gestion des états (disponible, occupé, sélectionné)</li>
+                            <li>Appel REST pour ajout panier + redirection checkout</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================
+             SLIDE 11: CODE - WC ORDER COMPLETE
+             ================================================================ -->
+        <section class="slide slide-code" data-slide="11">
+            <div class="slide-content">
+                <div class="section-label animate-in">04 - Code</div>
+                <h2 class="slide-title animate-in delay-1">wc-order-complete.php</h2>
+                <p class="slide-subtitle animate-in delay-1">→ Hook WooCommerce après paiement validé</p>
+                <div class="code-highlights animate-in delay-2">
+                    <div class="code-section">
+                        <h3>🔄 Flow après paiement</h3>
+                        <div class="flow-mini">
+                            <div class="flow-step-mini">Paiement OK</div>
+                            <div class="flow-arrow-mini">→</div>
+                            <div class="flow-step-mini">Hook déclenché</div>
+                            <div class="flow-arrow-mini">→</div>
+                            <div class="flow-step-mini">Créer CPT</div>
+                            <div class="flow-arrow-mini">→</div>
+                            <div class="flow-step-mini">Mettre à jour JSON</div>
+                            <div class="flow-arrow-mini">→</div>
+                            <div class="flow-step-mini">Supprimer lock</div>
+                        </div>
+                    </div>
+                    <div class="code-section">
+                        <h3>📍 Le hook WordPress</h3>
+                        <pre><code>add_action('woocommerce_order_status_completed', function($order_id) {
+    $order = wc_get_order($order_id);
+    foreach ($order->get_items() as $item) {
+        // Récupérer les meta de réservation
+        // Créer le CPT cw_reservation
+        // Mettre à jour reservations_json de l'offre
+        // Supprimer le lock correspondant
+    }
+});</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================
+             SLIDE 12: CONCLUSION
+             ================================================================ -->
+        <section class="slide slide-conclusion" data-slide="12">
+            <div class="slide-content">
+                <div class="section-label animate-in">Conclusion</div>
+                <h2 class="slide-title animate-in delay-1">Ce que j'ai appris</h2>
+                <div class="learnings-grid animate-in delay-2">
+                    <div class="learning-item">
+                        <span class="learning-icon">🏗️</span>
+                        <h3>Architecture Modulaire</h3>
+                        <p>Découper en snippets indépendants = maintenabilité</p>
+                    </div>
+                    <div class="learning-item">
+                        <span class="learning-icon">⚡</span>
+                        <h3>Race Conditions</h3>
+                        <p>Toujours penser multi-utilisateurs, même sur WordPress</p>
+                    </div>
+                    <div class="learning-item">
+                        <span class="learning-icon">🔌</span>
+                        <h3>Hooks WordPress</h3>
+                        <p>Actions/Filters pour étendre sans modifier le core</p>
+                    </div>
+                    <div class="learning-item">
+                        <span class="learning-icon">🌐</span>
+                        <h3>REST API</h3>
+                        <p>Communication frontend/backend propre et découplée</p>
+                    </div>
+                    <div class="learning-item">
+                        <span class="learning-icon">🔐</span>
+                        <h3>RGPD en pratique</h3>
+                        <p>Consentement, anonymisation IP, rétention 3 ans</p>
+                    </div>
+                    <div class="learning-item">
+                        <span class="learning-icon">🔧</span>
+                        <h3>Debugging Production</h3>
+                        <p>CRON de maintenance = système qui s'auto-répare</p>
+                    </div>
+                </div>
+                <div class="questions-prompt animate-in delay-3">
+                    <h2>Questions ?</h2>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Keyboard shortcuts help -->
+    <div class="shortcuts-help" id="shortcutsHelp">
+        <div class="shortcuts-content">
+            <h3>Raccourcis clavier</h3>
+            <div class="shortcuts-grid">
+                <div class="shortcut-group">
+                    <h4>Navigation</h4>
+                    <div class="shortcut"><kbd>→</kbd> <kbd>Espace</kbd> Slide suivante</div>
+                    <div class="shortcut"><kbd>←</kbd> Slide précédente</div>
+                    <div class="shortcut"><kbd>1-9</kbd> Aller à la slide N</div>
+                </div>
+                <div class="shortcut-group">
+                    <h4>Présentation</h4>
+                    <div class="shortcut"><kbd>F</kbd> Plein écran</div>
+                    <div class="shortcut"><kbd>?</kbd> Afficher cette aide</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
