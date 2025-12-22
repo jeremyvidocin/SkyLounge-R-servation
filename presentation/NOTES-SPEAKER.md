@@ -392,16 +392,80 @@ Cette slide donne une vue d'ensemble. Le détail vient dans les slides suivantes
 - ❌ Aller trop vite sur les parties techniques
 - ❌ S'excuser constamment
 
-### QUESTIONS DIFFICILES ANTICIPÉES :
+---
 
-| Question | Réponse |
-|----------|---------|
-| "Pourquoi pas utiliser un ORM ?" | WordPress n'a pas d'ORM natif, et wpdb suffit pour ce use case |
-| "C'est scalable ?" | Pour le volume actuel oui, mais si explosion → migration table SQL |
-| "Et les tests ?" | Pas implémentés, c'est dans les améliorations futures |
-| "Tu referais quoi différemment ?" | Maquetter l'archi CPT avant, et commencer par le système de réservation |
-| "Pourquoi pas React ?" | Zéro build, léger, pas de complexité inutile pour ce use case |
-| "Le JSON peut-il corrompre ?" | CRON de vérification quotidien + rebuild si désync |
+## 📚 GLOSSAIRE TECHNIQUE - DÉFINITIONS À CONNAÎTRE
+
+### WordPress & Écosystème
+
+| Terme | Définition simple | Si on te demande plus |
+|-------|-------------------|----------------------|
+| **CPT (Custom Post Type)** | Un type de contenu personnalisé dans WordPress. Comme les "Articles" ou "Pages" mais créé sur-mesure. | "WordPress a par défaut les posts et pages. Un CPT permet de créer ses propres types, ici j'ai créé 'Offres Coworking' avec ses propres champs." |
+| **ACF (Advanced Custom Fields)** | Plugin qui permet d'ajouter des champs personnalisés aux CPT. | "Sans ACF, je devrais tout coder en PHP. ACF me donne une interface admin pour créer des champs comme 'prix', 'capacité', etc." |
+| **Elementor** | Page builder visuel pour WordPress. Drag & drop. | "C'est un éditeur WYSIWYG qui permet de construire des pages sans coder le HTML/CSS à la main." |
+| **WooCommerce** | Plugin e-commerce pour WordPress. Gère le panier, paiement, commandes. | "C'est la solution e-commerce la plus utilisée sur WordPress. Je l'utilise uniquement pour le tunnel de paiement." |
+| **Code Snippets** | Plugin qui permet d'ajouter du code PHP sans modifier le thème. | "Au lieu de modifier functions.php ou créer un plugin, j'ajoute des snippets indépendants. Plus facile à maintenir." |
+| **Hook (Action/Filter)** | Point d'ancrage dans WordPress pour exécuter du code à un moment précis. | "Une action = j'exécute du code quand un événement se produit (ex: après paiement). Un filter = je modifie une donnée avant qu'elle soit affichée." |
+| **Shortcode** | Balise entre crochets qui exécute du PHP. Ex: `[coworking_calendar]` | "C'est un raccourci. J'écris `[coworking_calendar]` dans une page et ça affiche mon calendrier complet." |
+
+### Concepts Techniques Généraux
+
+| Terme | Définition simple | Si on te demande plus |
+|-------|-------------------|----------------------|
+| **REST API** | Interface qui permet à deux systèmes de communiquer via HTTP (GET, POST, DELETE...) | "Le frontend JS appelle une URL comme `/wp-json/coworking/v1/availability` et reçoit du JSON. C'est découplé du backend." |
+| **Endpoint** | Une URL spécifique de l'API qui fait une action précise. | "J'ai 3 endpoints : un pour récupérer les dispos, un pour ajouter au panier, un pour annuler un lock." |
+| **JSON** | Format de données texte, léger et lisible. Clé-valeur. | "C'est comme un tableau associatif mais en texte. `{\"date\": \"2025-01-15\", \"status\": \"booked\"}`. Facile à lire et parser." |
+| **Transient** | Variable temporaire stockée en base WordPress avec une durée de vie (TTL). | "C'est comme une variable de session mais côté serveur. Elle expire automatiquement après X secondes." |
+| **TTL (Time To Live)** | Durée de vie d'une donnée avant qu'elle expire automatiquement. | "Mon lock a un TTL de 20 minutes. Après ça, il disparaît tout seul, pas besoin de le supprimer manuellement." |
+| **CRON** | Tâche planifiée qui s'exécute automatiquement à intervalles réguliers. | "WordPress a son propre système CRON. J'ai une tâche qui tourne chaque nuit pour vérifier la cohérence des données." |
+| **Nonce** | Token de sécurité unique pour vérifier qu'une requête est légitime. | "Ça empêche les attaques CSRF. Le frontend envoie un token, le backend vérifie qu'il est valide." |
+
+### Concepts de Concurrence
+
+| Terme | Définition simple | Si on te demande plus |
+|-------|-------------------|----------------------|
+| **Race Condition** | Bug quand deux processus accèdent à la même ressource en même temps. | "Deux users cliquent en même temps → sans protection, les deux peuvent réserver la même place." |
+| **Lock (Verrou)** | Mécanisme qui bloque une ressource temporairement pour un seul utilisateur. | "Quand User A sélectionne une date, je pose un lock. User B voit que c'est 'en cours' et ne peut pas réserver." |
+| **Mutex** | Un type de lock qui garantit qu'un seul processus accède à une ressource. | "Mutex = Mutual Exclusion. C'est le concept théorique, mon implémentation utilise les transients WordPress." |
+| **Pessimistic Locking** | On verrouille la ressource AVANT de la modifier. | "C'est ce que je fais : je lock AVANT l'ajout au panier. Approche prudente." |
+| **Optimistic Locking** | On vérifie au moment de sauvegarder si quelqu'un d'autre a modifié. | "L'alternative serait de vérifier au moment du paiement. Risque : l'utilisateur a perdu 10 min pour rien." |
+| **Atomique** | Opération qui s'exécute entièrement ou pas du tout, pas d'état intermédiaire. | "set_transient() est atomique : soit le lock est créé, soit il ne l'est pas. Pas de lock 'à moitié'." |
+
+### Base de Données & Performance
+
+| Terme | Définition simple | Si on te demande plus |
+|-------|-------------------|----------------------|
+| **wpdb** | Classe PHP de WordPress pour interagir avec la base de données. | "C'est l'équivalent d'un ORM basique. Je fais `$wpdb->get_results()` pour exécuter du SQL." |
+| **JOIN** | Requête SQL qui combine des données de plusieurs tables. | "Un JOIN est coûteux en performance. Mon JSON évite les JOINs car tout est dans un seul champ." |
+| **Cache** | Stockage temporaire pour éviter de recalculer/requêter les mêmes données. | "Mon JSON dans ACF est un cache. Plutôt que requêter toutes les réservations à chaque fois, je lis un seul champ." |
+| **Désynchronisation** | Quand deux sources de données ne sont plus cohérentes. | "Si le JSON dit 'disponible' mais qu'il y a une réservation dans le CPT → désync. Mon CRON corrige ça." |
+
+### Sécurité & RGPD
+
+| Terme | Définition simple | Si on te demande plus |
+|-------|-------------------|----------------------|
+| **CSRF** | Attaque où un site malveillant fait exécuter une action à un user connecté. | "Sans nonce, un attaquant pourrait créer un lien qui ajoute une réservation à l'insu de l'utilisateur." |
+| **Sanitize** | Nettoyer une entrée utilisateur pour éviter les injections. | "`sanitize_text_field()` enlève les balises HTML et caractères dangereux d'une chaîne." |
+| **RGPD** | Règlement européen sur la protection des données personnelles. | "Je dois : demander le consentement, anonymiser les IPs, permettre la suppression des données." |
+| **Consentement explicite** | L'utilisateur doit activement accepter (pas de case pré-cochée). | "Une checkbox que l'user doit cocher lui-même avant de pouvoir payer." |
+| **Anonymisation IP** | Masquer une partie de l'adresse IP pour ne pas identifier la personne. | "Je remplace le dernier octet par 0. `192.168.1.123` devient `192.168.1.0`." |
+
+---
+
+## 🎯 QUESTIONS DIFFICILES ANTICIPÉES
+
+| Question | Réponse courte | Réponse détaillée si on insiste |
+|----------|----------------|--------------------------------|
+| "Pourquoi pas utiliser un ORM ?" | WordPress n'a pas d'ORM natif, et wpdb suffit pour ce use case | "Un ORM comme Doctrine ou Eloquent ajouterait une dépendance lourde. wpdb fait le job pour des requêtes simples. Si le projet grossissait, je considérerais un ORM." |
+| "C'est scalable ?" | Pour le volume actuel oui, mais si explosion → migration table SQL | "Le JSON est rapide jusqu'à quelques milliers de réservations. Au-delà, je migrerais vers une table SQL dédiée avec index." |
+| "Et les tests ?" | Pas implémentés, c'est dans les améliorations futures | "J'aurais dû commencer par les tests. Maintenant que le code fonctionne, ajouter PHPUnit est dans ma roadmap." |
+| "Tu referais quoi différemment ?" | Maquetter l'archi CPT avant, et commencer par le système de réservation | "J'ai perdu du temps sur les templates avant de clarifier le besoin. Prochaine fois : specs d'abord." |
+| "Pourquoi pas React ?" | Zéro build, léger, pas de complexité inutile pour ce use case | "React aurait demandé une toolchain (npm, webpack, etc.). Pour un calendrier, Vanilla JS suffit et pèse 30KB vs 150KB." |
+| "Le JSON peut-il corrompre ?" | CRON de vérification quotidien + rebuild si désync | "Le CRON compare le JSON avec les vrais CPT chaque nuit. Si désync détectée, il rebuild le JSON." |
+| "Pourquoi Transients et pas Redis ?" | Transients sont natifs WordPress, Redis demande une config serveur | "Les transients utilisent la table wp_options par défaut. Si Redis est configuré, WordPress l'utilise automatiquement." |
+| "Comment tu gères les paiements échoués ?" | Le lock expire automatiquement, la place redevient disponible | "Si le paiement échoue, le lock a un TTL de 20 min max. Après expiration, la date est à nouveau réservable." |
+| "Qu'est-ce qui se passe si le serveur crash pendant une réservation ?" | Les transients sont en base de données, donc persistants | "Même si le serveur redémarre, le lock est toujours là car stocké en base. Il expirera naturellement après le TTL." |
+| "C'est sécurisé ?" | Nonces WordPress + sanitization + capability checks | "Chaque requête API vérifie le nonce (anti-CSRF), les inputs sont sanitizés, et je vérifie les permissions utilisateur." |
 
 ---
 
