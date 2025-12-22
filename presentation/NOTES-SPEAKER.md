@@ -52,12 +52,12 @@ Montrer que tu es :
 ### Points clés :
 - **Objectif** : Insister sur le fait que c'est une vraie demande métier
 - **Stack** : WordPress + WooCommerce + ACF + Code Snippets
-- **Contrainte** : Pas de budget plugin = tout à faire soi-même
+- **Contrainte** : Pas de plugins payants = développement sur-mesure
 - **Livrables** : ~400 KB de code PHP, 14 modules
 
 ### Questions potentielles :
-- *"Pourquoi WordPress ?"* → C'est l'écosystème client, pas mon choix
-- *"Pourquoi pas Amelia ?"* → Budget + besoin de customisation poussée
+- *"Pourquoi WordPress ?"* → C'est l'écosystème existant, pas mon choix
+- *"Pourquoi pas Amelia ?"* → Besoin de customisation poussée + pas de budget plugins
 
 ---
 
@@ -83,9 +83,6 @@ Montrer que tu es :
 
 ### ⚠️ Si on te demande plus de détails :
 > "C'était pour moi, pour visualiser le design avant l'intégration. Ça m'a aidé à structurer mes idées."
-
-### Ce que tu montres :
-- Si possible, ouvrir le site en live pour montrer le résultat final
 
 ---
 
@@ -218,8 +215,8 @@ Montrer que tu es :
 - Backend : Locks + Disponibilités + Validation
 - Data : CPT Réservation + WC Orders + JSON Cache
 
-### Ce que tu fais :
-> "Après cette slide, je vous propose une démo live de l'application."
+### Ce que tu expliques :
+> "Le frontend ne fait jamais d'appel direct à la base de données. Tout passe par l'API REST, ce qui permet un découplage propre."
 
 ---
 
@@ -227,46 +224,49 @@ Montrer que tu es :
 **Durée : 3 min**
 
 ### Ce que tu dis :
-> "Le code est découpé en 14 modules indépendants. Voici les priorités."
+> "Le code est découpé en 14 modules indépendants. Je ne vais pas tous les détailler, on va se concentrer sur les plus critiques."
 
-### Points clés :
-- **P1-3** : Core (config, booking-engine, disponibilités)
+### Points clés à mentionner :
+- **P1-3** : Core (config, booking-engine, disponibilités) - LE CŒUR
 - **P4** : Frontend (calendrier JS complet)
-- **P5** : Hook WooCommerce
-- **P6-8** : Admin
-- **P9-14** : Features additionnelles
+- **P5** : Hook WooCommerce (après paiement)
+- Les autres sont des features additionnelles (admin, notif, PDF, RGPD...)
 
 ### Chiffre clé :
 > "~400 KB de code PHP au total, architecture modulaire via Code Snippets"
 
+### ⚠️ Ne pas s'attarder :
+Cette slide donne une vue d'ensemble. Le détail vient dans les slides suivantes.
+
 ---
 
 ## SLIDES 12-14 : CODE
-**Durée : 10 min** ⚠️ IMPORTANT - OUVRIR VS CODE
+**Durée : 8 min** ⚠️ SLIDES IMPORTANTES
 
-### Ce que tu fais :
-**Ouvrir VS Code et naviguer dans les fichiers**
+### Approche :
+- Le code est déjà affiché sur les slides
+- Explique la **logique métier**, pas la syntaxe ligne par ligne
+- Montre que tu comprends ce que tu as codé
 
-### Fichiers à montrer :
+### Fichiers présentés :
 
-#### 1. booking-engine-v2.php
-- **Ligne ~65** : `cw_get_lock_ttl()` - TTL adaptatif
-- **Ligne ~220** : `coworking_check_availability_with_locks()` - Vérifie réservations ET locks
-- Expliquer la logique métier
+#### 1. booking-engine-v2.php (Slide 12)
+- Fonction `coworking_check_availability_with_locks()`
+- Vérifie réservations confirmées ET locks temporaires
+- Nettoyage auto des locks expirés
 
-#### 2. calendrier-v2.php
-- Architecture Vanilla JS
-- Shortcode `[coworking_calendar]`
-- Appels REST async
+#### 2. API REST (Slide 13)
+- 3 endpoints : GET availability, POST add-to-cart, DELETE release-lock
+- Communication frontend/backend découplée
 
-#### 3. wc-order-complete.php
-- Hook `woocommerce_order_status_completed`
-- Flow : Paiement OK → Créer CPT → Update JSON → Supprimer lock
+#### 3. Flow complet (Slide 14)
+- 6 étapes de la sélection au paiement
+- Le lock est créé AVANT l'ajout au panier (moment clé !)
 
 ### Attitude :
-- Ne pas lire le code ligne par ligne
-- Expliquer la **logique**, pas la syntaxe
-- Répondre aux questions en montrant le code
+- Ne pas lire le code mot pour mot
+- Expliquer **pourquoi** chaque étape existe
+- Répondre aux questions avec assurance
 
 ---
 
@@ -372,7 +372,7 @@ Montrer que tu es :
 3. **Ce que je ferais différemment** : Maquetter avant, tests dès le début
 
 ### Fin :
-> "Je suis disponible pour vos questions. Je peux ouvrir VS Code pour montrer n'importe quelle partie du code."
+> "Je suis disponible pour vos questions."
 
 ---
 
@@ -382,8 +382,8 @@ Montrer que tu es :
 - ✅ Parler lentement et clairement
 - ✅ Regarder ton audience, pas l'écran
 - ✅ Admettre quand tu ne sais pas ("Je vais vérifier et revenir vers vous")
-- ✅ Proposer d'ouvrir VS Code pour les questions
 - ✅ Être honnête sur les limites
+- ✅ Prendre ton temps sur les slides techniques
 
 ### À NE PAS FAIRE :
 - ❌ Lire les slides mot pour mot
@@ -409,13 +409,13 @@ Montrer que tu es :
 
 | Section | Durée |
 |---------|-------|
-| Slides 1-4 (Intro, WP) | 8 min |
+| Slides 1-4 (Intro, WP) | 9 min |
 | Slides 5-6 (Jira) | 5 min |
-| Slides 7-9 (Difficultés, Décisions) | 10 min |
-| Slides 10-11 (Architecture) | 4 min |
+| Slides 7-9 (Difficultés, Décisions) | 11 min |
+| Slides 10-11 (Architecture) | 5 min |
 | Slides 12-14 (Code) | 8 min |
 | Slide 15 (Métriques) | 3 min |
-| Slides 16-17 (Limites, Conclusion) | 7 min |
+| Slides 16-17 (Limites, Conclusion) | 4 min |
 | **TOTAL** | **45 min** |
 
 ---
