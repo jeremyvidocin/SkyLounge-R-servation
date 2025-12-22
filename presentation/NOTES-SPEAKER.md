@@ -68,21 +68,21 @@ Montrer que tu es :
 > "Avant de parler du système de réservation, j'ai d'abord dû construire le site lui-même. C'était ma première vraie expérience complète avec WordPress, ACF et Elementor."
 
 ### Points clés :
-- **Police Gilroy** : Charte graphique premium fournie par le client
+- **Police Gilroy** : Charte graphique premium du site
 - **Couleurs** : Bleu SkyLounge #1e73be, vert success #10b981
 - **Elementor Pro** : Page builder pour l'intégration
 - **Pages créées** : Accueil, landing, singles, archives
 
-### 💡 IMPORTANT - Démarche Design :
-> "Avant d'intégrer, j'ai maquetté le design sur **Lovable** pour valider les composants et l'UX. Ça m'a permis de tester rapidement différentes approches avant de passer à Elementor."
+### 💡 Démarche Design :
+> "J'ai utilisé **Lovable** pour maquetter certains composants avant de les intégrer. Ça m'a permis de tester rapidement le rendu visuel avant de passer sur Elementor."
 
 ### Pourquoi mentionner Lovable :
-- Montre une **démarche méthodique** (pas de code direct)
-- Prouve que tu réfléchis à l'UX **avant** de coder
-- Outil moderne → tu suis les tendances
+- Montre que tu **réfléchis avant de coder**
+- Prototypage rapide = gain de temps
+- Tu sais utiliser des outils modernes
 
-### Si on te demande plus de détails :
-> "Lovable m'a permis de prototyper rapidement les composants clés comme le calendrier de réservation. J'ai pu itérer sur le design et valider avec le client avant de passer à l'intégration WordPress."
+### ⚠️ Si on te demande plus de détails :
+> "C'était pour moi, pour visualiser le design avant l'intégration. Ça m'a aidé à structurer mes idées."
 
 ### Ce que tu montres :
 - Si possible, ouvrir le site en live pour montrer le résultat final
